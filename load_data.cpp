@@ -25,26 +25,26 @@ void getConfig() {
 }
 
 int main(const int FolderNumber, const char** COrU) {
-    ifstream FileC;
-    getConfig();
-    string FolderNumberstr = to_string(FolderNumber);
-    FileC.open(getfolder()+"\\Fallender_Tropfen"+FolderNumberstr+COrU[0]);
-    if (!FileC.is_open()&&DevMode==true) {
+    ifstream FileC;                                         //erstellt FileC als lesedatei
+    getConfig();                                            //holt sich die Config usw
+    string FolderNumberstr = to_string(FolderNumber);       //gibt FolderNumber als string an
+    FileC.open(getfolder()+"\\Fallender_Tropfen\\"+FolderNumberstr+"\\"+COrU[0]);      //öffnet den ordner Fallender Tropfen\ Nummer des Ordners + C oder U in diesem
+    if (!FileC.is_open()&&DevMode==true) {                              //wenn die Datei nicht geöffntet werden kann und der DevMode an ist gibt es einen Error aus
         cout << "Error in opening file" << endl;
     }
-    FileC.ignore(1000, '>');
+    FileC.ignore(1000, '>');            //geht bis nach dem symbol > in der Datei, hinter diesem befinden sich die Werte
     int LineNumber;
-    FileC >> LineNumber;
-    int LineContent[LineNumber][3];
-    if (DevMode==true) {
+    FileC >> LineNumber;                        //holt sich die zahl die hier steht als Int
+    int LineContent[LineNumber][3];             //array zum speichern der drei datenmengen
+    if (DevMode==true){                         //wenn devmode true gibt menge der linien an
         cout << LineNumber << endl;
     }
-    for (int i = 0; i < LineNumber; i++) {
-        FileC.ignore(4, '\n');
-        FileC >> LineContent[i][0] >> LineContent[i][1] >> LineContent[i][2];
+    for (int i = 0; i < LineNumber; i++) {                  //wiederholt programm für dateimenge
+        FileC.ignore(4, '\n');                      //überspringt nicht zahleneinheiten
+        FileC >> LineContent[i][0] >> LineContent[i][1] >> LineContent[i][2];           // liest drei werte aus der datei aus
     }
     if (DevMode==true) {
-        for (int i = 0; i < LineNumber; i++) {
+        for (int i = 0; i < LineNumber; i++) {          //spuckt die werte wieder aus wemnn DevMode==true
             for (int j = 0; j < 3; j++) {
                 cout << LineContent[i][j] << " ";
             }

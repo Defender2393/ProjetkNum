@@ -6,9 +6,8 @@ using namespace std;
 bool DevMode;
 
 string getfolder() {
-    filesystem::path Ordnerpath = filesystem::current_path();   //Ordnerpath findet den ordnerpfad und setzt Ordnerpath als diesen
-    string Ordnerstring = Ordnerpath.string();                  //gibt Ordnerstring mit dem selben information wie ordnerpath als string an
-    cout << Ordnerstring << endl;                               //gibt den string aus
+    filesystem::path Filepath = filesystem::current_path();   //Ordnerpath findet den ordnerpfad und setzt Ordnerpath als diesen
+    string Ordnerstring = Filepath.string();                  //gibt Ordnerstring mit dem selben information wie ordnerpath als string an//gibt den string aus
     return Ordnerstring;                                        //gibt als die Funktionswerk Ordnerstring aus
 }
 void getConfig() {
@@ -25,11 +24,36 @@ void getConfig() {
     config.close();
 }
 
-int main() {
-    ifstream FileC;                         //noch workinprogress
+int main(const int FolderNumber, const char** COrU) {
+    ifstream FileC;
     getConfig();
-    FileC.open(getfolder()+"");
+    string FolderNumberstr = to_string(FolderNumber);
+    FileC.open(getfolder()+"\\Fallender_Tropfen"+FolderNumberstr+COrU[0]);
+    if (!FileC.is_open()&&DevMode==true) {
+        cout << "Error in opening file" << endl;
+    }
+    FileC.ignore(1000, '>');
+    int LineNumber;
+    FileC >> LineNumber;
+    int LineContent[LineNumber][3];
+    if (DevMode==true) {
+        cout << LineNumber << endl;
+    }
+    for (int i = 0; i < LineNumber; i++) {
+        FileC.ignore(4, '\n');
+        FileC >> LineContent[i][0] >> LineContent[i][1] >> LineContent[i][2];
+    }
+    if (DevMode==true) {
+        for (int i = 0; i < LineNumber; i++) {
+            for (int j = 0; j < 3; j++) {
+                cout << LineContent[i][j] << " ";
+            }
+            cout << endl;
+        }
+    }
 
 
-    return 0;
+
+
+    return LineNumber;
 }

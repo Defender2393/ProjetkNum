@@ -7,3 +7,6 @@
 using namespace std;
 class Partikel (){};
 class Grid      (){};
+int main () {
+
+}

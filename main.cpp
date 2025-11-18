@@ -5,6 +5,7 @@
 #include <string>
 #include <filesystem>
 #include <iostream>
+#include <GeleseneDatenC.h>
 using namespace std;
 bool DevMode;
 
@@ -74,15 +75,6 @@ int GetData(const int FolderNumber, const char COrU) {
     }
     else {
         cout << "Error COrU is neither C nor U" << endl;
-    }
-
-    if (DevMode==true) {
-        for (int i = 0; i < LineNumber; i++) {          //spuckt die werte wieder aus wemnn DevMode==true
-            for (int j = 0; j < 3; j++) {
-                cout << LineContent[i][j] << " ";
-            }
-            cout << endl;
-        }
     }
     return LineNumber;
 }

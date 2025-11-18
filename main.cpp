@@ -7,14 +7,16 @@
 #include <iostream>
 #include <vector>
 #include <array>
-#include "GeleseneDatenC.h"
+//#include "GeleseneDatenC.h"
 using namespace std;
 bool DevMode=false;
 int LineNumber[4];
 int kinematicLine;
 char Character = 'C';
 string FolderNumber;
-vector<vector<float >> LineContent;
+array< float , 12> help_Line;
+array<float , 9 > help_kinematic;
+vector<array<float , 12>> LineContent;
 vector<array<float ,9 >> kinematicContent;
 
 
@@ -43,7 +45,7 @@ int GetData(const string FolderNumberstr) {
     for (int z= 0; z < 2 ; z++){
     FileC.open(getfolder()+"\\Fallender_Tropfen\\"+FolderNumberstr+"\\"+Character);      //öffnet den ordner Fallender Tropfen\ Nummer des Ordners + C oder U in diesem
     if (!FileC.is_open()&&DevMode==true) {                              //wenn die Datei nicht geöffntet werden kann und der DevMode an ist gibt es einen Error aus
-        cout << "Error in opening file" << endl;
+       cout << "Error in opening file" << endl;
     }
     FileC.ignore(1000, '>');            //geht bis nach dem symbol > in der Datei, hinter diesem befinden sich die Werte
     FileC >> LineNumber[0+3*z]; //holt sich die zahl die hier steht als Int
@@ -52,23 +54,23 @@ int GetData(const string FolderNumberstr) {
         cout << LineNumber[0] << endl;
     }
     for (int i = 0; i < LineNumber[0]; i++) {                  //wiederholt programm für dateimenge
-        FileC.ignore(4, '(');                      //
-        FileC >> LineContent[i][0+3*z] >> LineContent[i][1+3*z] >> LineContent[i][2+3*z];           // liest drei werte aus der datei aus
+        FileC.ignore(4, '(');
+        LineContent.push_back(help_Line);//
+        FileC >> LineContent[i][0+z*3] >> LineContent[i][1+z*3] >> LineContent[i][2+3*z];           // liest drei werte aus der datei aus
     }
 
     if (Character == 'C') {
         FileC.ignore(1000, '>');
-        int LineNumber1;
-        FileC >> LineNumber1;
+        FileC >> LineNumber[1];
         FileC.ignore(1, '(');
-        for (int i = 0; i < LineNumber1; i++) {
+        for (int i = 0; i < LineNumber[1]; i++) {
             FileC.ignore(4, '(');
             FileC >> LineContent[i][6] >> LineContent[i][7] >> LineContent[i][8];
         }
         FileC.ignore(1000, '>');
         FileC >> LineNumber[2];
         FileC.ignore(1, '(');
-        for (int j = 0; j < LineNumber1; j++) {
+        for (int j = 0; j < LineNumber[2]; j++) {
             FileC.ignore(4, '(');
             FileC >> LineContent[j][9] >> LineContent[j][10] >> LineContent[j][11];
         }
@@ -84,6 +86,7 @@ int GetData(const string FolderNumberstr) {
     FileC.ignore(10, '(');
     for (int i = 0; i < kinematicLine; i++) {
         FileC.ignore(10, '(');
+        kinematicContent.push_back(help_kinematic);
         FileC >> kinematicContent[i][0] >> kinematicContent[i][1] >> kinematicContent[i][2];
     }
     FileC.close();
@@ -104,9 +107,9 @@ int GetData(const string FolderNumberstr) {
 }
 int main() {
         getConfig();
-    string NameNumber;
     cout << "Bitte die Nummer des Gewünschten Ordners angeben" << endl;
-    cin >> FolderNumber>> NameNumber;
+    cin >> FolderNumber;
+    GetData(FolderNumber);
     float kinematicContentTransfer[kinematicLine][9];
     for (int i = 0; i < kinematicLine; i++) {
         for (int j = 0; j < 9; j++) {
@@ -120,13 +123,26 @@ int main() {
         }
     }
     if (DevMode) {
-        cout << "Bestätige mit 1" << endl;
-        int Devhelp;
+        cout << "Bestaetige die Ausgabe der lagrangian daten mit 1" << endl;
+        int Devhelp=0;
         cin >> Devhelp;
         if (Devhelp==1){
             for (int i = 0; i < kinematicLine; i++) {
-                for (int j = 0; j < 9; j++) {
+                for (int j = 6; j < 10; j++) {
                     cout << kinematicContent[i][j] << " ";
+                }
+                    cout << endl;
+                }
+            }
+        }
+    if (DevMode) {
+        cout << "Bestatige die Ausgabe der C daten mit 1" << endl;
+        int Devhelp=0;
+        cin >> Devhelp;
+        if (Devhelp==1) {
+            for (int i = 0; i < LineNumber[0]; i++) {
+                for (int j = 0; j < 3; j++) {
+                    cout<< LineContent[i][j] << " ";
                 }
                 cout << endl;
             }

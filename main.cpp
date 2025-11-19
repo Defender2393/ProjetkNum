@@ -11,7 +11,7 @@
 #include "GeleseneDatenC.h"
 #include <locale>
 #include <algorithm>
-using namespace std;
+using namespace std;                                                                                                    //alle genutzen variablen werden hier deklariert
 bool DevMode=false;
 int LineNumber[4];
 int kinematicLine;
@@ -25,6 +25,7 @@ bool ErrorIsThere = false;
 float PhysVar1;
 float PhysVar2;
 int IsTropfenOrFoam;
+bool MinorErrorIsThere = false;
 
 string getfolder() {
     filesystem::path Filepath = filesystem::current_path();   //Ordnerpath findet den ordnerpfad und setzt Ordnerpath als diesen
@@ -38,13 +39,13 @@ void getConfig() {
         ErrorIsThere = true;
     }
     config.ignore(100, '=');                            //geht bis zu 100 zeichen nach dem nächsten =
-    config >> DevMode;
+    config >> DevMode;                                           //setzt die Variable DevMode
     config.ignore(100, '=');                            //geht bis zu 100 zeichen nach dem nächsten =
-    config >> PhysVar1;
+    config >> PhysVar1;                                         //Setzt zwei physische Variablen auf werte
     config.ignore(100, '=');
     config >> PhysVar2;
     config.ignore(100, '=');
-    config >> IsTropfenOrFoam;
+    config >> IsTropfenOrFoam;                                  //determiniert ob es sich um Tropfen oder Spray handelt
     if (DevMode) {
         cout << DevMode << endl;                                //wenn devmode=1 ist gibt es 1 aus
     }
@@ -55,35 +56,35 @@ void getConfig() {
 
 
 int GetData(const string& FolderNumberstr) {
-    ifstream FileC; //erstellt FileC als lesedatei
+    ifstream FileC;                                                                                                     //erstellt FileC als lesedatei
     for (int z= 0; z < 2 ; z++){
-    FileC.open(getfolder()+"\\Fallender_Tropfen\\"+FolderNumberstr+"\\"+Character);      //öffnet den ordner Fallender Tropfen\ Nummer des Ordners + C oder U in diesem
+    FileC.open(getfolder()+"\\Fallender_Tropfen\\"+FolderNumberstr+"\\"+Character);                                     //öffnet den ordner Fallender Tropfen\ Nummer des Ordners + C oder U in diesem
         FileC.imbue(std::locale::classic());
-        if (!FileC.is_open()&&DevMode==true&&ErrorIsThere==false) {                              //wenn die Datei nicht geöffntet werden kann und der DevMode an ist gibt es einen Error aus
+        if (!FileC.is_open()&&DevMode==true&&ErrorIsThere==false) {                                                     //wenn die Datei nicht geöffntet werden kann und der DevMode an ist gibt es einen Error aus
        cout << "Error in opening file, have you checked weather the Ordner you want opened has the intended Name" << endl;
         ErrorIsThere = true;
     }
-    FileC.ignore(1000, '>');            //geht bis nach dem symbol > in der Datei, hinter diesem befinden sich die Werte
-    FileC >> LineNumber[0+3*z]; //holt sich die zahl die hier steht als Int
-    FileC.ignore(1000, '(');            //array zum speichern der drei datenmengen
-    if (DevMode&&!ErrorIsThere&&z==0){                         //wenn devmode true ist und kein Error existiert gibt menge der linien an
+    FileC.ignore(1000, '>');                                                                                    //geht bis nach dem symbol > in der Datei, hinter diesem befinden sich die Werte
+    FileC >> LineNumber[0+3*z];                                                                                         //holt sich die zahl die hier steht als Int, diese beschreibt die anzahl an datensätzen
+    FileC.ignore(1000, '(');                                                                                    //array zum speichern der drei datenmengen
+    if (DevMode&&!ErrorIsThere&&z==0){                                                                                     //wenn devmode true ist und kein Error existiert gibt menge der linien an
         cout << LineNumber[0] << endl;
     }
-    for (int i = 0; i < LineNumber[0]; i++) {                  //wiederholt programm für dateimenge
+    for (int i = 0; i < LineNumber[0]; i++) {                                                                           //wiederholt programm für dateimenge
         FileC.ignore(4, '(');
-        LineContent.push_back(help_Line);//
-        FileC >> LineContent[i][0+z*3] >> LineContent[i][1+z*3] >> LineContent[i][2+3*z];           // liest drei werte aus der datei aus
+        LineContent.push_back(help_Line);//                                                                             //der Vektor wird dynamisch vergrösert
+        FileC >> LineContent[i][0+z*3] >> LineContent[i][1+z*3] >> LineContent[i][2+3*z];                                // liest drei werte aus der datei aus
     }
 
-    if (Character == 'C') {
+    if (Character == 'C') {                                                                                             //hier wird eine fallunterscheidung vorgenommen da C und U verschiedene Formate haben
         FileC.ignore(1000, '>');
-        FileC >> LineNumber[1];
+        FileC >> LineNumber[1];                                                                                         //bei C gibt es noch weitere daten die auf dem normalen weg extrahiert werden
         FileC.ignore(1, '(');
         for (int i = 0; i < LineNumber[1]; i++) {
             FileC.ignore(4, '(');
-            FileC >> LineContent[i][6] >> LineContent[i][7] >> LineContent[i][8];
+            FileC >> LineContent[i][6] >> LineContent[i][7] >> LineContent[i][8];                                       //diese werden auf die anderen positionen des vektors geschrieben
         }
-        FileC.ignore(1000, '>');
+        FileC.ignore(1000, '>');                                                                               //wird zweimal gemacht da zwei weitere sets an daten existieren
         FileC >> LineNumber[2];
         FileC.ignore(1, '(');
         for (int j = 0; j < LineNumber[2]; j++) {
@@ -95,32 +96,25 @@ int GetData(const string& FolderNumberstr) {
     }
     }
     FileC.close();
-    FileC.open(getfolder()+"\\Fallender_Tropfen\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\)"+Character);
-    FileC.imbue(std::locale::classic());
-    std::string line;
-
-    // Skip until we find a line that contains ONLY an integer
-    while (std::getline(FileC, line))
+    FileC.open(getfolder()+"\\Fallender_Tropfen\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\)"+Character);       //öffnet die lagranian dateien und extrahier hier
+    FileC.imbue(locale::classic());                                                                                 //locale::classic setzt die spracheinstellungen auf classic dass floats gelesen werden können
+    string line;
+    while (getline(FileC, line))                                                                                    //solange noch zeilen in datei liest diese
     {
-        std::stringstream ss(line);
-
-        // Try to read an integer
-        if (ss >> kinematicLine)
+        stringstream ss(line);                                                                                          //erstellt einen stream an strings aus der zeile(einfacher zu nutzen)
+        if (ss >> kinematicLine)                                                                                        //versucht das erste wort aus der zeile in kinematicline zu lesen, kinematicline akzeptiert nur zahlen
         {
-            // Make sure the rest of the line is empty or whitespace
-            std::string remainder;
-            ss >> remainder;
+            string remainder;
+            ss >> remainder;                                                                                            //übergibt das nächste symbol dem rmainer
 
-            if (remainder.empty())
-                break;   // We found the line with the count
+            if (remainder.empty())                                                                                      //wenn remainder empty endet die while schleife
+                break;                                                                                                  //existiert da die zeile mit unserem wert nur ein token enthällt
         }
     }
-
-    // If kinematicLine is still 0 or we failed to parse
     if (kinematicLine <= 0) {
-        std::cout << "Failed to find entry count in kinematicCloud. Last read line was:"
+        std::cout << "Error: Failed to find entry count in kinematicCloud. Last read line was:"                         //gibt einen error aus wenn es nicht funktioniert hat
                   << std::endl << "[" << line << "]" << std::endl;
-        return -1;
+        MinorErrorIsThere = true;
     }
 
     FileC.ignore(numeric_limits<streamsize>::max(), '(');
@@ -128,72 +122,69 @@ int GetData(const string& FolderNumberstr) {
         FileC.ignore(numeric_limits<streamsize>::max(), '(');
         kinematicContent.push_back(help_kinematic);
 
-        FileC >> kinematicContent[i][0] >> kinematicContent[i][1] >> kinematicContent[i][2];
+        FileC >> kinematicContent[i][0] >> kinematicContent[i][1] >> kinematicContent[i][2];                            //liest wie gewohnt die daten aus
     }
     FileC.close();
 
-    // --- Open the 'd' file ---
-    FileC.open(getfolder()+"\\Fallender_Tropfen\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\d)");
+    FileC.open(getfolder()+"\\Fallender_Tropfen\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\d)");                //öffnet das d file
     FileC.imbue(std::locale::classic());
-    if (!FileC.is_open()) {
+    if (!FileC.is_open()) {                                                                                             //wenn kein file geöffnet wird gibt errorcode aus und ein minor error flag
         cout << "Error opening d file!" << endl;
-        ErrorIsThere = true;
-        return -1;
+        MinorErrorIsThere = true;
     }
 
-    // Skip tokens until we reach '('
-    std::string token;
+    string token;                                                                                                       //deklariert einen string um so nach der richtigen pos zu suchen
     while (FileC >> token) {
-        if (token == "(") break;   // reached the start of data
+        if (token == "(") break;                                                                                        //sucht bis es eine klammer auf findet
     }
 
-    // Read floats
     for (int i = 0; i < kinematicLine; ++i) {
-        float value;
-        while (!(FileC >> value)) {       // skip non-numeric tokens
-            FileC.clear();                // clear fail state
-            FileC >> token;               // consume invalid token
+        float value;                //
+        while (!(FileC >> value)) {                                                                                     // überspringt nicht nummern
+            FileC.clear();                                                                                              // cleared Fails
+            FileC >> token;                                                                                             //schreibt FileC als string
         }
         kinematicContent[i][3] = value;
     }
-
-    // No need to read the closing ')' explicitly
     FileC.close();
 
-
-
+    //laest positions auf dem ueblichen weg aus
     FileC.open(getfolder()+"\\Fallender_Tropfen\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\positions)");
     FileC.imbue(std::locale::classic());
-    FileC.ignore(1000, '(');
+    FileC.ignore(numeric_limits<streamsize>::max(), '(');                                                       //typische operation um auszulesen
     for (int i = 0; i < kinematicLine; i++) {
         FileC.ignore(numeric_limits<streamsize>::max(), '(');
         FileC >> kinematicContent[i][4] >> kinematicContent[i][5] >> kinematicContent[i][6];
-        FileC.ignore(numeric_limits<streamsize>::max(), ')');
+        FileC.ignore(numeric_limits<streamsize>::max(), ')');                                                   //da hier hinter der klammer noch ein wert existiert wird dieser hier ausgelesen
         FileC >> kinematicContent[i][7];
     }
-    return LineNumber[0];
+    return LineNumber[0];   //gibt die normale linenumber zurück
 }
 int main() {
         getConfig();
     cout << "Bitte die Nummer des Gewuenschten Ordners in korrekter schreibweise angeben" << endl;
-    cin >> FolderNumber;
+    cin >> FolderNumber;                                                                                                //man gibt manuell einen Ordner seine nummer als string an
     GetData(FolderNumber);
-
-    if (ErrorIsThere==false) {
+    if (DevMode) {
+        if (MinorErrorIsThere) {
+            cout << "Minor error detected, read the error returns"<<endl;
+        }
+    }
+    if (ErrorIsThere==false) {                                                                                          //wenn kein error da ist und es Tropfen ist werden zwei variablen deklariert die auf beides zugeschniten ist
         if (IsTropfenOrFoam==1) {
             float LineContentTransfer[18][12];
             float kinematicContentTransfer[1][8];
             for (int i = 0; i < kinematicLine; i++) {
-                for (int j = 0; j < 8; j++) {
+                for (int j = 0; j < 8; j++) {                                                                           //überträgt die daten vom vektor auf ein array da man vektoren nicht einfach einlesen kann
                     kinematicContentTransfer[i][j] = kinematicContent[i][j];
                 }
             }
-            for (int i = 0; i < LineNumber[1]; i++) {
+            for (int i = 0; i < LineNumber[1]; i++) {                                                                   //selbiges für den anderen Vektorraum
                 for (int j = 0; j < 12; j++) {
                     LineContentTransfer[i][j] = LineContent[i][j];
                 }
             }
-            GeleseneDatenC Classname(LineNumber, LineContentTransfer, kinematicLine, kinematicContentTransfer);
+            GeleseneDatenC Classname(LineNumber, LineContentTransfer, kinematicLine, kinematicContentTransfer);         //kreirt die klasse mit den variablen
         }
         //else if (IsTropfenOrFoam==2) {
           //  float LineContentTransfer[1625][12];

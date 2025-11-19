@@ -10,6 +10,7 @@
 #include <iomanip>
 #include "GeleseneDatenC.h"
 #include <locale>
+#include <algorithm>
 using namespace std;
 bool DevMode=false;
 int LineNumber[4];
@@ -50,6 +51,7 @@ void getConfig() {
 
     config.close();
 }
+
 
 
 int GetData(const string& FolderNumberstr) {
@@ -129,15 +131,37 @@ int GetData(const string& FolderNumberstr) {
         FileC >> kinematicContent[i][0] >> kinematicContent[i][1] >> kinematicContent[i][2];
     }
     FileC.close();
+
+    // --- Open the 'd' file ---
     FileC.open(getfolder()+"\\Fallender_Tropfen\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\d)");
     FileC.imbue(std::locale::classic());
-    FileC.ignore(numeric_limits<streamsize>::max(), '(');
-    for (int i = 0; i < kinematicLine; i++) {
-        FileC.ignore(numeric_limits<streamsize>::max(), '(');
-
-       FileC >> kinematicContent[i][3];
+    if (!FileC.is_open()) {
+        cout << "Error opening d file!" << endl;
+        ErrorIsThere = true;
+        return -1;
     }
+
+    // Skip tokens until we reach '('
+    std::string token;
+    while (FileC >> token) {
+        if (token == "(") break;   // reached the start of data
+    }
+
+    // Read floats
+    for (int i = 0; i < kinematicLine; ++i) {
+        float value;
+        while (!(FileC >> value)) {       // skip non-numeric tokens
+            FileC.clear();                // clear fail state
+            FileC >> token;               // consume invalid token
+        }
+        kinematicContent[i][3] = value;
+    }
+
+    // No need to read the closing ')' explicitly
     FileC.close();
+
+
+
     FileC.open(getfolder()+"\\Fallender_Tropfen\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\positions)");
     FileC.imbue(std::locale::classic());
     FileC.ignore(1000, '(');

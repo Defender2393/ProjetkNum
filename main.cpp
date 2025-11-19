@@ -161,93 +161,121 @@ int GetData(const string& FolderNumberstr) {
     return LineNumber[0];   //gibt die normale linenumber zurück
 }
 int main() {
-        getConfig();
+    // Lädt die Konfiguration aus einer externen Datei oder setzt Standardwerte
+    getConfig();
+
+    // Benutzeraufforderung: Nummer des gewünschten Ordners eingeben
     cout << "Bitte die Nummer des Gewuenschten Ordners in korrekter schreibweise angeben" << endl;
-    cin >> FolderNumber;                                                                                                //man gibt manuell einen Ordner seine nummer als string an
+    cin >> FolderNumber; // Benutzer gibt Ordnernummer als String ein
+
+    // Liest die Daten aus dem angegebenen Ordner
     GetData(FolderNumber);
+
+    // Wenn der Entwicklermodus aktiv ist, prüfe auf kleinere Fehler
     if (DevMode) {
         if (MinorErrorIsThere) {
-            cout << "Minor error detected, read the error returns"<<endl;
+            cout << "Minor error detected, read the error returns" << endl;
         }
     }
-    if (ErrorIsThere==false) {                                                                                          //wenn kein error da ist und es Tropfen ist werden zwei variablen deklariert die auf beides zugeschniten ist
-        if (IsTropfenOrFoam==1) {
+
+    // Wenn kein Fehler aufgetreten ist, weiter mit der Datenverarbeitung
+    if (ErrorIsThere == false) {
+        // Spezieller Fall: Wenn es sich um "Tropfen" handelt
+        if (IsTropfenOrFoam == 1) {
+            // Arrays zur Zwischenspeicherung der Daten erstellen
             float LineContentTransfer[18][12];
             float kinematicContentTransfer[1][8];
+
+            // Kinematik-Daten vom Vektor auf ein Array übertragen
             for (int i = 0; i < kinematicLine; i++) {
-                for (int j = 0; j < 8; j++) {                                                                           //überträgt die daten vom vektor auf ein array da man vektoren nicht einfach einlesen kann
+                for (int j = 0; j < 8; j++) {
                     kinematicContentTransfer[i][j] = kinematicContent[i][j];
                 }
             }
-            for (int i = 0; i < LineNumber[1]; i++) {                                                                   //selbiges für den anderen Vektorraum
+
+            // Andere Linieninhalte ebenfalls auf Array übertragen
+            for (int i = 0; i < LineNumber[1]; i++) {
                 for (int j = 0; j < 12; j++) {
                     LineContentTransfer[i][j] = LineContent[i][j];
                 }
             }
-            GeleseneDatenC Classname(LineNumber, LineContentTransfer, kinematicLine, kinematicContentTransfer);         //kreirt die klasse mit den variablen
+
+            // Klasse instanziieren, die die gelesenen Daten speichert
+            GeleseneDatenC Classname(LineNumber, LineContentTransfer, kinematicLine, kinematicContentTransfer);
         }
-        //else if (IsTropfenOrFoam==2) {
-          //  float LineContentTransfer[1625][12];
-            //float kinematicContentTransfer[1625][8];
-       // }
+
+        // Entwicklermodus: Debug-Ausgabe zur Überprüfung der eingelesenen Daten
         if (DevMode) {
             cout << fixed;
-            cout << "Bestaetige die Ausgabe der" << getfolder() <<"\\FallenderTropfen\\"<< FolderNumber <<"\\lagrangian\\kinematicCloud daten mit 1" << endl;
-            int Devhelp=0;
+
+            // Benutzer bestätigen lassen, dass die kinematischen Daten korrekt sind
+            cout << "Bestaetige die Ausgabe der" << getfolder() << "\\FallenderTropfen\\" << FolderNumber << "\\lagrangian\\kinematicCloud daten mit 1" << endl;
+            int Devhelp = 0;
             cin >> Devhelp;
-            if (Devhelp==1){
+            if (Devhelp == 1) {
+                // Kinematik-Daten ausgeben
                 for (int i = 0; i < kinematicLine; i++) {
                     for (int j = 0; j < 8; j++) {
                         float tempdata = kinematicContent[i][j];
-
                         cout << tempdata << endl;
                     }
                     cout << endl;
                 }
             }
-            cout << "Bestatige die Ausgabe der daten aus " << getfolder() <<"\\FallenderTropfen\\"<< FolderNumber <<"\\C mit 1" << endl;
-            Devhelp=0;
+
+            // Benutzer bestätigen lassen, dass die Linieninhalte korrekt sind
+            cout << "Bestatige die Ausgabe der daten aus " << getfolder() << "\\FallenderTropfen\\" << FolderNumber << "\\C mit 1" << endl;
+            Devhelp = 0;
             cin >> Devhelp;
-            if (Devhelp==1) {
+            if (Devhelp == 1) {
+                // Erste Datengruppe ausgeben
                 for (int i = 0; i < LineNumber[0]; i++) {
                     for (int j = 0; j < 3; j++) {
-                        cout<< LineContent[i][j] << " ";
+                        cout << LineContent[i][j] << " ";
                     }
                     cout << endl;
                 }
+
+                // Zweite Datengruppe ausgeben
                 cout << "Das zweite set an vektordaten" << endl;
                 for (int i = 0; i < LineNumber[1]; i++) {
                     for (int j = 6; j < 9; j++) {
-                        cout<< LineContent[i][j] << " ";
+                        cout << LineContent[i][j] << " ";
                     }
                     cout << endl;
                 }
+
+                // Dritte Datengruppe ausgeben
                 cout << "Das dritte set an vektordaten" << endl;
                 for (int i = 0; i < LineNumber[2]; i++) {
                     for (int j = 9; j < 12; j++) {
-                        cout<< LineContent[i][j] << " ";
+                        cout << LineContent[i][j] << " ";
                     }
                     cout << endl;
                 }
-                cout << "Bestatige die Ausgabe der daten aus " << getfolder() <<"\\FallenderTropfen\\"<< FolderNumber <<"\\U mit 1" << endl;
-                Devhelp=0;
+
+                // U-Daten ausgeben
+                cout << "Bestatige die Ausgabe der daten aus " << getfolder() << "\\FallenderTropfen\\" << FolderNumber << "\\U mit 1" << endl;
+                Devhelp = 0;
                 cin >> Devhelp;
-                if (Devhelp==1) {
+                if (Devhelp == 1) {
                     for (int i = 0; i < LineNumber[3]; i++) {
                         for (int j = 3; j < 6; j++) {
-                            cout<< LineContent[i][j] << " ";
+                            cout << LineContent[i][j] << " ";
                         }
                         cout << endl;
                     }
                 }
             }
         }
-
     }
-    else if (ErrorIsThere==true) {
+    // Fehlerbehandlung: Wenn ein Fehler aufgetreten ist
+    else if (ErrorIsThere == true) {
         if (DevMode) {
-            cout<< "There was an Error opening a vital File, check the other Error messages for more Information" << endl;
+            cout << "There was an Error opening a vital File, check the other Error messages for more Information" << endl;
         }
     }
-        return 27;
-    }
+
+    // Rückgabewert des Programms
+    return 27;
+}

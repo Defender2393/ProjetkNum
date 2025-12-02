@@ -53,13 +53,21 @@ int main() {
     getConfig();
 
     // Benutzeraufforderung: Nummer des gewünschten Ordners eingeben
-    cout << "Bitte die Nummer des Gewuenschten Ordners in korrekter schreibweise angeben" << endl;
-    cin >> FolderNumber; // Benutzer gibt Ordnernummer als String ein
-    Particle Ptest(getfolder(), FolderNumber, DevMode);
-    GeleseneDatenC Ftest(getfolder(), FolderNumber, DevMode);
+   // cout << "Bitte die Nummer des Gewuenschten Ordners in korrekter schreibweise angeben" << endl;
+  //  cin >> FolderNumber; // Benutzer gibt Ordnernummer als String ein
+    FolderNumber="0";
+    Particle ParticleData(getfolder(), FolderNumber, DevMode);
     if (DevMode) {
-        Ptest.PrintValue();
-        Ftest.PrintValue();
+        ParticleData.PrintValue();
+    }
+    GeleseneDatenC FieldData(getfolder(), FolderNumber, DevMode);
+    if (DevMode) {
+        FieldData.PrintValue();
+    }
+    if (IsTropfenOrFoam==1) {
+        ParticleData.increaseTime();
+        FolderNumber=to_string(ParticleData.GiveTime()*0.5);
+        GeleseneDatenC FieldData(getfolder(), FolderNumber, DevMode);
     }
     // Fehlerbehandlung: Wenn ein Fehler aufgetreten ist
     // Rückgabewert des Programms

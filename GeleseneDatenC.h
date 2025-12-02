@@ -16,9 +16,9 @@ class GeleseneDatenC {
     bool ErrorIsThere=false;
     bool Dev=false;
     ifstream File;
-    vector <array<int ,2>> LineNumber;
-    vector<array<double, 12>> CContent;
-    vector<array<double, 12>> UContent;
+    int LineNumber[2];
+    vector<array<double, 3>> CContent;
+    vector<array<double, 3>> UContent;
     string Folder;
     string Number;
 public:
@@ -28,84 +28,72 @@ public:
         Folder = getfolder;
         Dev=DevMode;
         Number = FolderNumberstr;
-        char Character='C';
+        char Character;
         for (int z= 0; z < 2 ; z++){
-            int helper=0;
+            if (z==0) {
+                Character = 'C';
+            }
     File.open(getfolder+"\\Fallender_Tropfen\\"+FolderNumberstr+"\\"+Character);                                     //öffnet den ordner Fallender Tropfen\ Nummer des Ordners + C oder U in diesem
         File.imbue(std::locale::classic());
         if (!File.is_open()&&DevMode==true&&ErrorIsThere==false) {                                                     //wenn die Datei nicht geöffntet werden kann und der DevMode an ist gibt es einen Error aus
        cout << "Error in opening file, have you checked weather the Ordner you want opened has the intended Name" << endl;
         ErrorIsThere = true;
     }
+            if (DevMode==true) {
+                cout << Character<< endl;
+            }
             string token;
-            while (!File.eof()){
-        while (File >> token) {
-            if (token == ">")
-                {
-                helper++;
-                LineNumber.push_back(array<int, 2>{});
-                break;
-                }
-        }
-        File >> LineNumber[helper-1][z];
-                for (int y = 0; y < LineNumber[helper-1][z]; y++) {
-                    while (File >> token) {
-                        if (token == "(")break;
-                    }
+        File.ignore(1000,'>');
+        File >> LineNumber[z];
+            File.ignore(4,'(');
+                for (int y = 0; y < LineNumber[z]; y++) {
+                    File.ignore(4,'(');
                     if (Character=='C'){
-                        if (CContent.size()<=LineNumber[helper-1][z])CContent.push_back(array<double, 12>{});
-                        File >> CContent[y][3*helper-1] >> CContent[y][3*helper] >> CContent[y][3*helper+1];
+                        if (DevMode){cout <<y;}
+                        CContent.push_back(array<double, 3>{});
+                        File >> CContent[y][0] >> CContent[y][1] >> CContent[y][2];
                     }
                     else if (Character=='U'){
-                        if (CContent.size()<=LineNumber[helper][z])CContent.push_back(array<double, 12>{});
-                        File >> CContent[y][3*helper-1] >> CContent[y][3*helper] >> CContent[y][3*helper+1];
+                        if (DevMode){cout <<y;}
+                        UContent.push_back(array<double, 3>{});
+                        File >> UContent[y][0] >> UContent[y][1] >> UContent[y][2];
                     }
                 }
-
-     }
-        Character='U';
+            Character='U';
             File.close();
+     }
 
-        }
+
+
 
 
 
     };
 public:
     void PrintValue() {
-        int Devhelp;
-        cout << "Bestatige die Ausgabe der daten aus " << Folder << "\\FallenderTropfen\\" << Number << "\\C mit 1" << endl;
-        Devhelp = 0;
-        cin >> Devhelp;
-        if (Devhelp == 1) {
-        for (int z = 0; z < LineNumber.size() ; z++){
-            cout << "Das " << z+1 << ". Set an Daten " << endl;
+        cout << " Ausgabe der daten aus " << Folder << "\\FallenderTropfen\\" << Number << "\\C" << endl;
+
 
                 // Erste Datengruppe ausgeben
-                for (int i = 0; i < LineNumber[z][0]; i++) {
-                    for (int j = 0+3*z; j < 3+z*3; j++) {
+                for (int i = 0; i < LineNumber[0]; i++) {
+                    for (int j = 0; j < 3; j++) {
                         cout << CContent[i][j] << " ";
                     }
                     cout << endl;
                 }
-            }
-        }
-        cout << "Bestatige die Ausgabe der daten aus " << Folder << "\\FallenderTropfen\\" << Number << "\\U mit 1" << endl;
-        Devhelp = 0;
-        cin >> Devhelp;
-        if (Devhelp == 1) {
-        for (int z = 0; z < LineNumber.size() ; z++){
-            cout << "Das " << z+1 << ". Set an Daten " << endl;
+
+
+        cout << "Ausgabe der daten aus " << Folder << "\\FallenderTropfen\\" << Number << "\\U" << endl;
 
                 // Erste Datengruppe ausgeben
-                for (int i = 0; i < LineNumber[z][1]; i++) {
-                    for (int j = 0+3*z; j < 3+z*3; j++) {
+                for (int i = 0; i < LineNumber[1]; i++) {
+                    for (int j = 0; j < 3; j++) {
                         cout << UContent[i][j] << " ";
                     }
                     cout << endl;
                 }
-            }
-        }
+
+
     }
 
 

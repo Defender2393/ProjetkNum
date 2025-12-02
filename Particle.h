@@ -16,11 +16,12 @@ class Particle {
     bool ErrorIsThere = false;
     bool Dev = false;
     ifstream File;
-    vector <array<double, 8>> kinematicContent;
+    vector <array<double, 8>> kinematicContent;//pos 0-2 is for U, pos 3 for d pos 4-7 for posisitions
     int kinematicLine;
     string Folder;
     string Number;
-
+    int TimeSteps;
+    vector <array<double, 8>> temporaryContent;
     public:
     Particle(string getfolder, string FolderNumberstr,bool DevMode) {
         Folder = getfolder;
@@ -92,10 +93,7 @@ class Particle {
 public:
     void PrintValue() {
         cout << fixed;
-        cout << "Bestaetige die Ausgabe der" << Folder << "\\FallenderTropfen\\" << Number << "\\lagrangian\\kinematicCloud daten mit 1" << endl;
-        int Devhelp = 0;
-        cin >> Devhelp;
-        if (Devhelp == 1) {
+        cout << "Ausgabe der" << Folder << "\\FallenderTropfen\\" << Number << "\\lagrangian\\kinematicCloud daten" << endl;
             // Kinematik-Daten ausgeben
             for (int i = 0; i < kinematicLine; i++) {
                 for (int j = 0; j < 8; j++) {
@@ -104,7 +102,72 @@ public:
                 }
                 cout << endl;
             }
+    }
+    int CreateFile(string getfolder,string FolderNumberStr,string fileName) {
+        ofstream File;
+        File.open(getfolder+"\\FallenderTropfen\\"+FolderNumberStr+R"(\lagrangian\kinematicCloud\)"+fileName);
+        File <<  R"(/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2412                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    arch        "LSB;label=32;scalar=64";
+    class       vectorField;
+    location    ")"<<FolderNumberStr<<R"(/lagrangian/kinematicCloud";
+    object      )"<<fileName<<R"(;
+}
+        // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+)"<<kinematicLine<<R"(
+()";
+    for (int i = 0; i < kinematicLine; i++) {
+        if (fileName == "U"){
+            File<<"("<< kinematicContent[i][4]<<" "<<kinematicContent[i][5]<<" "<<kinematicContent[i][6]<<")"<<kinematicContent[i][7];
         }
+        if (fileName == "d"){
+            File<<"("<< kinematicContent[i][3]<<")";
+        }
+        if (fileName == "U"){
+            File<<"("<< kinematicContent[i][0]<<" "<<kinematicContent[i][1]<<" "<<kinematicContent[i][2]<<")";
+    }}
+        File<<R"()
+
+        // ************************************************************************* //
+        )";
+    File.close();
+    }
+    void increaseTime() {
+        for (int i = 0; i < kinematicLine; i++) {
+            for (int j = 0; j < 8; j++) {
+                kinematicContent[i][j] = temporaryContent[i][j];
+            }
+        }
+        TimeSteps = TimeSteps + 1;
+        double Fldrhelp= 0.5*TimeSteps;
+        string FldrNumber=std::to_string(Fldrhelp);
+        //hier werdem die neuem dateipunkte hinnzugefügt werden#
+        for (int i = 0; i < 3; i++) {
+            string temp;
+            if (i == 0) {
+                temp = "U";
+            }
+            else if (i == 1) {
+                temp = "d";
+            }
+            else if (i == 2) {
+                temp="positions";
+            }
+            CreateFile(Folder,FldrNumber,temp);
+        }
+    }
+    int GiveTime() {
+        return TimeSteps;
     }
 };
 

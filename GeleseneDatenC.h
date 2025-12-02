@@ -95,8 +95,12 @@ public:
 
 
     }
-
-
+    double CValue(int z, int y) {
+        return CContent[z][y];
+    }
+    double UValue(int z, int y) {
+        return UContent[z][y];
+    }
 };
 
 

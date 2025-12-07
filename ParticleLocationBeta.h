@@ -4,15 +4,15 @@
 #include <array>
 using namespace std;
 
-const double U_max = 7.06423;
+const double U_max = 7.06423; //zuvor berechnet 
 const double diameter = 0.002;
 double tau;
 double Reynolds;
 double U_cx = 0.0;
 double U_cy = 0.0;
 double U_cz = 0.0;
-double U_px;
-double pos_x;
+double U_px, U_py, U_pz;
+double pos_x, pos_y, pos_z;
 int Cell_ID;
 const double g = 9.81;
 const double rho_c = 1.199;
@@ -21,10 +21,10 @@ const double zweidurchdrei = 2.0/3.0;
 const double eta = 1.824878 * 1e-5;
 const double deltaT = 0.5;
 const double Zeitpunktmax = 11.0;
- double pos_y = 30.0;
- double pos_z = 5.0;
- double U_py = 0.0;
- double U_pz = 0.0;
+const double pos_y = 30.0;
+const double pos_z = 5.0;
+const double U_py = 0.0;
+const double U_pz = 0.0;
 double U_p;
 vector <array<double, 8>> temporaryContent;
 vector <double> timeContent;
@@ -40,7 +40,7 @@ double Re_von_Partikel(double U_px, double diameter){
 }
 
 
-vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double pos_x, double U_py, double pos_y, double U_pz, double pos_z){
+vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double U_pz, double pos_x, double pos_y, double pos_z){
     double U_px0 = U_px;
     double pos_x0 = pos_x;
     
@@ -51,9 +51,9 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double pos_x, doubl
     if(U_px0 <= U_max){
             
         }
-      //  cout << "|U_p|: " << U_px0 << " Zum Zeitpunkt " << Zeitpunkt << endl;
+        cout << "|U_p|: " << U_px0 << " Zum Zeitpunkt " << Zeitpunkt << endl;
     
-        if(U_px0 == 0){
+        if(U_px0 == 0.0){
 
             tau = 4.0 / 3.0 * (rho_p * pow(diameter, 2)) / (eta * REp * Widerstand);
             U_px0 = U_px0 + ((abs(U_cx - U_px0)/tau) + g * (1 - (rho_c / rho_p))) * deltaT / (1 + (deltaT / tau));
@@ -75,14 +75,14 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double pos_x, doubl
     
         U_px1 = U_px0 + ((abs(U_cx - U_px0)/tau) + g * (1 - (rho_c / rho_p))) * deltaT / (1 + (deltaT / tau)); //Immernoch angenommen, dass U_c = 0 !
        if (U_px1 >= U_max){
-     //   cout <<"Das Equilibrium und somit die theoretisch maximal erreichbare Geschwindigkeit ist erreicht!" << endl;
+        cout <<"Das Equilibrium und somit die theoretisch maximal erreichbare Geschwindigkeit ist erreicht!" << endl;
         U_px1 = U_max;
        }
                                                                                          //Und die Bewegung der Teilchen ist nur in x- und y Richtung berücksichtigt 
         U_px0 = U_px1;                                                                              //Trotzdem darf man die z-Koordinate nicht auslassen 
         
- //       cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px0 << endl;
-   //     cout << "U_py zum Zeitpunkt " << Zeitpunkt <<": " << U_py << endl;
+        cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px0 << endl; 
+        cout << "U_py zum Zeitpunkt " << Zeitpunkt <<": " << U_py << endl;
 temporaryArray[0] = U_px0;
 temporaryArray[1] = U_py;
 temporaryArray[2] = U_pz;
@@ -94,8 +94,8 @@ temporaryArray[2] = U_pz;
                                                                                               
             pos_x0 = pos_x1;
            
-    //        cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x0<< endl;
-   //         cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y << endl;
+            cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x0<< endl; 
+            cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y << endl;
 temporaryArray[3] = diameter;
 temporaryArray[4] = pos_x0;
 temporaryArray[5] = pos_y;
@@ -127,7 +127,7 @@ if(Cell_ID > 17){
 if(abs(fmod(pos_x0 , C_dist_x)) == 0.0 || abs(fmod(pos_y, C_dist_y) == 0.0)){  
     cout << "Das Partikel befindet sich genau zwischen zwei Zellen!" << endl;
 }
-  //  cout << "Host_ID: " << Cell_ID << " zum Zeitpunkt " << Zeitpunkt <<  endl;
+    cout << "Host_ID: " << Cell_ID << " zum Zeitpunkt " << Zeitpunkt <<  endl;
     
     
     Zeitpunkt += deltaT;

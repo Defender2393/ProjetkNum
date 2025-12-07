@@ -21,6 +21,10 @@ const double zweidurchdrei = 2.0/3.0;
 const double eta = 1.824878 * 1e-5;
 const double deltaT = 0.5;
 const double Zeitpunktmax = 11.0;
+const double pos_y = 30.0;
+const double pos_z = 5.0;
+const double U_py = 0.0;
+const double U_pz = 0.0;
 double U_p;
 vector <array<double, 8>> temporaryContent;
 vector <double> timeContent;
@@ -30,13 +34,13 @@ double temptransfer;
 class Partikel_Eigenschaften{
 
 public:
-double Re_von_Partikel(double U_p, double diameter){
-    Reynolds = (rho_c * U_p * diameter)/eta;
+double Re_von_Partikel(double U_px, double diameter){
+    Reynolds = (rho_c * U_px * diameter)/eta;
         return Reynolds;
 }
 
 
-vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double pos_x){
+vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double pos_x, double U_py, double pos_y, double U_pz, double pos_z){
     double U_px0 = U_px;
     double pos_x0 = pos_x;
     
@@ -48,7 +52,15 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double pos_x){
             
         }
         cout << "|U_p|: " << U_px0 << " Zum Zeitpunkt " << Zeitpunkt << endl;
-    REp = Re_von_Partikel(U_px0, diameter);
+    
+        if(U_px0 == 0){
+
+            tau = 4.0 / 3.0 * (rho_p * pow(diameter, 2)) / (eta * REp * Widerstand);
+            U_px0 = U_px0 + ((abs(U_cx - U_px0)/tau) + g * (1 - (rho_c / rho_p))) * deltaT / (1 + (deltaT / tau));
+
+        }
+    
+        REp = Re_von_Partikel(U_px0, diameter);
         if(REp <= 0){             
             cout << "Fehler und/oder es wird durch null geteilt!" << endl; 
             break;
@@ -66,8 +78,7 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double pos_x){
         cout <<"Das Equilibrium und somit die theoretisch maximal erreichbare Geschwindigkeit ist erreicht!" << endl;
         U_px1 = U_max;
        }
-        U_py = 0.0;
-        U_pz = 0.0;                                                                                 //Und die Bewegung der Teilchen ist nur in x- und y Richtung berücksichtigt 
+                                                                                         //Und die Bewegung der Teilchen ist nur in x- und y Richtung berücksichtigt 
         U_px0 = U_px1;                                                                              //Trotzdem darf man die z-Koordinate nicht auslassen 
         
         cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px0 << endl; 
@@ -76,18 +87,18 @@ temporaryArray[0] = U_px0;
 temporaryArray[1] = U_py;
 temporaryArray[2] = U_pz;
             
-            double pos_y0 = 30.0;
+            
             double pos_x1, pos_y1;
             pos_x1 = pos_x0 + U_px0 * deltaT;
             
-            pos_z = 0.0;    //z-Komponente wird nicht berücksichtigt und bleibt daher konstant                                                                                 
+                                                                                              
             pos_x0 = pos_x1;
            
             cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x0<< endl; 
-            cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y0 << endl;
+            cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y << endl;
 temporaryArray[3] = diameter;
 temporaryArray[4] = pos_x0;
-temporaryArray[5] = pos_y0;
+temporaryArray[5] = pos_y;
 temporaryArray[6] = pos_z;
 
 const double C_dist_x = 12; // Kantenlänge der Zelle in x-Richtung
@@ -98,14 +109,14 @@ const int AnzC_y = 3; // Anzahl der Zellen in y-Richtung
 if(pos_x0 >= 72.0){
     cout << "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: " << U_p <<" zum Zeitpunkt " << Zeitpunkt - deltaT << endl;
     int Hilfe_x = (pos_x1 / C_dist_x);
-    int Hilfe_y = (pos_y1 / C_dist_y);
+    int Hilfe_y = (pos_y / C_dist_y);
     Cell_ID = Hilfe_y * AnzC_x + Hilfe_x;
     cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: " << Cell_ID << endl;
 temporaryArray[7] = Cell_ID;
     break;
 }
     int Hilfe_x = (pos_x0 / C_dist_x);
-    int Hilfe_y = (pos_y0 / C_dist_y);
+    int Hilfe_y = (pos_y / C_dist_y);
     Cell_ID = Hilfe_y * AnzC_x + Hilfe_x;
 temporaryArray[7] = Cell_ID;
 if(Cell_ID > 17){
@@ -113,7 +124,7 @@ if(Cell_ID > 17){
     break;
 }
 
-if(abs(fmod(pos_x0 , C_dist_x)) == 0.0 || abs(fmod(pos_y0, C_dist_y) == 0.0)){  
+if(abs(fmod(pos_x0 , C_dist_x)) == 0.0 || abs(fmod(pos_y, C_dist_y) == 0.0)){  
     cout << "Das Partikel befindet sich genau zwischen zwei Zellen!" << endl;
 }
     cout << "Host_ID: " << Cell_ID << " zum Zeitpunkt " << Zeitpunkt <<  endl;
@@ -157,7 +168,7 @@ int control(){ //Dient nur zur Kontrolle, kann bzw muss später entfernt werden
 
 Partikel_Eigenschaften Partikel1 ;                                   //                        
 Partikel1.Re_von_Partikel(U_px, diameter);               //Zeile 129 - 131 nicht loeschen!
-Partikel1.U_und_pos_von_Partikel(U_px, pos_x);                       //
+Partikel1.U_und_pos_von_Partikel(U_px, pos_x, U_py, pos_y, U_pz, pos_z);                       //
     
     return 0;
 }

@@ -35,7 +35,7 @@ double Re_von_Partikel(double U_p, double diameter){
 }
 
 
-double U_und_pos_von_Partikel(double U_px, double pos_x){
+vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double pos_x){
     double U_px0 = U_px;
     double pos_x0 = pos_x;
     
@@ -128,8 +128,8 @@ if(abs(fmod(pos_x0 , C_dist_x)) == 0.0 || abs(fmod(pos_y0, C_dist_y) == 0.0)){
    for (int i = 0; i < temporaryContent.size() ; i++) {
             for (int j = 0; j < 8; j++) {
 
-                temptransfer = temporaryContent[i][j];
-                return temptransfer;
+                return  temporaryContent;
+
             }
         
         }

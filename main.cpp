@@ -66,11 +66,11 @@ int main() {
         FieldData.PrintValue();
     }
     if (IsTropfenOrFoam==1) {
-        while (Ptime<11) {
+        for (int i=0; i<22; i++) {
             ParticleData.increaseTime();
             FolderNumber=to_string(ParticleData.GiveTime()*0.5);
             Ptime=ParticleData.GiveTime();
-            GeleseneDatenC FieldData(getfolder(), FolderNumber, DevMode);
+            //GeleseneDatenC FieldData(getfolder(), FolderNumber, DevMode);
         }
     }
     // Fehlerbehandlung: Wenn ein Fehler aufgetreten ist

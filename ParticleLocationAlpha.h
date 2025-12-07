@@ -18,7 +18,7 @@ const double g = 9.81;
 const double rho_c = 1.199;
 const double rho_p = 998.207;
 const double zweidurchdrei = 2.0/3.0;
-const double eta = 1.824878 * 1e-5;
+const double eta = 1.824878*1e-5;
 const double deltaT = 0.5;
 const double Zeitpunktmax = 11.0;
 double U_p;
@@ -125,16 +125,15 @@ if(abs(fmod(pos_x0 , C_dist_x)) == 0.0 || abs(fmod(pos_y0, C_dist_y) == 0.0)){
     temporaryContent.push_back(temporaryArray);
         
         }
-   for (int i = 0; i < temporaryContent.size() ; i++) {
-            for (int j = 0; j < 8; j++) {
+
 
                 return  temporaryContent;
 
             }
         
-        }
+
     
-    }
+
     double returnup() {
     if (U_py==0){U_p=U_px;}
     return U_p;

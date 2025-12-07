@@ -1,12 +1,14 @@
 #ifndef UNTITLED_PARTICLE_H
 #define UNTITLED_PARTICLE_H
-#include "ParticleLocationAlpha.h"
+#include "ParticleLocationBeta.h"
 #include <vector>
 #include <array>
 #include <locale>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <limits>
+#include <filesystem>
 using namespace std;
 
 class Particle {
@@ -17,9 +19,11 @@ class Particle {
     int kinematicLine;
     string Folder;
     string Number;
-    int TimeSteps;
+    int TimeSteps = 0;
     double RePartikel;
     vector <array<double, 8>> temporaryContent;
+    string namesofFiles[22]{"0.5","1","1.5","2","2.5","3","3.5","4","4.5","5","5.5","6","6.5","7","7.5","8","8.5","9","9.5","10","10.5","11"};
+
     public:
     Particle(string getfolder, string FolderNumberstr,bool DevMode) {
         Folder = getfolder;
@@ -101,9 +105,22 @@ public:
                 cout << endl;
             }
     }
-    int CreateFile(string getfolder,string FolderNumberStr,string fileName) {
-        ofstream File;
-        File.open(getfolder+"\\FallenderTropfen\\"+FolderNumberStr+R"(\lagrangian\kinematicCloud\)"+fileName);
+
+    void CreateFile(string getfolder,string FolderNumberStr,string fileName) {
+            // Build the full path
+            string dirPath = getfolder + "\\Fallender_Tropfen\\" + FolderNumberStr + R"(\uniform\lagrangian\kinematicCloud\)";
+
+            // Create all directories in the path if they don't exist
+            ofstream File;
+
+
+            File.open(dirPath + fileName);
+
+            if (!File.is_open()) {
+                cout << "Error opening file: " << dirPath + fileName << endl;
+                return;
+            }
+
         File <<  R"(/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
@@ -143,19 +160,20 @@ FoamFile
         // ************************************************************************* //
         )";
     File.close();
+        cout << fileName << endl;
     }
+
     void increaseTime() {
-        
-      //Argumente ergänzen
+        //Argumente ergänzen
         Partikel_Eigenschaften Partikel1;
-     
 
-                kinematicContent = Partikel1.U_und_pos_von_Partikel(kinematicContent[0][1],kinematicContent[0][5]);
 
-        RePartikel = Partikel1.Re_von_Partikel(Partikel1.returnup(),kinematicContent[0][3]);
+        kinematicContent = Partikel1.U_und_pos_von_Partikel(kinematicContent[0][0],kinematicContent[0][1],kinematicContent[0][2],kinematicContent[0][4],kinematicContent[0][5],kinematicContent[0][6]);
+
+        RePartikel = Partikel1.Re_von_Partikel(kinematicContent[0][0],kinematicContent[0][3]);
         TimeSteps = TimeSteps + 1;
         double Fldrhelp= 0.5*TimeSteps;
-        string FldrNumber=std::to_string(Fldrhelp);
+        string FldrNumber=to_string(Fldrhelp);
         //hier werdem die neuem dateipunkte hinnzugefügt werden#
         for (int i = 0; i < 4; i++) {
             string temp;
@@ -171,7 +189,7 @@ FoamFile
             else if (i == 3) {
                 temp = "Re";
             }
-            CreateFile(Folder,FldrNumber,temp);
+            CreateFile(Folder,namesofFiles[TimeSteps-1],temp);
         }
     }
     int GiveTime() {

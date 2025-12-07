@@ -135,7 +135,10 @@ if(abs(fmod(pos_x0 , C_dist_x)) == 0.0 || abs(fmod(pos_y0, C_dist_y) == 0.0)){
         }
     
     }
-    
+    double returnup() {
+    if (U_py==0){U_p=U_px;}
+    return U_p;
+}
 };
 
 

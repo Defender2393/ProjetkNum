@@ -146,15 +146,13 @@ FoamFile
     }
     void increaseTime() {
         
+      //Argumente ergänzen
         Partikel_Eigenschaften Partikel1;
-        RePartikel = Partikel1.Re_von_Partikel();        //Argumente ergänzen
-
      
-        for (int i = 0; i < kinematicLine; i++) {
-            for (int j = 0; j < 8; j++) {
-                kinematicContent[i][j] = Partikel1.U_und_pos_von_Partikel();
-            }
-        }
+
+                kinematicContent = Partikel1.U_und_pos_von_Partikel(kinematicContent[0][1],kinematicContent[0][5]);
+
+        RePartikel = Partikel1.Re_von_Partikel(Partikel1.returnup(),kinematicContent[0][3]);
         TimeSteps = TimeSteps + 1;
         double Fldrhelp= 0.5*TimeSteps;
         string FldrNumber=std::to_string(Fldrhelp);

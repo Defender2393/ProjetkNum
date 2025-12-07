@@ -11,8 +11,8 @@ double Reynolds;
 double U_cx = 0.0;
 double U_cy = 0.0;
 double U_cz = 0.0;
-double U_px, U_py, U_pz;
-double pos_x, pos_y, pos_z;
+double U_px;
+double pos_x;
 int Cell_ID;
 const double g = 9.81;
 const double rho_c = 1.199;
@@ -21,10 +21,10 @@ const double zweidurchdrei = 2.0/3.0;
 const double eta = 1.824878 * 1e-5;
 const double deltaT = 0.5;
 const double Zeitpunktmax = 11.0;
-const double pos_y = 30.0;
-const double pos_z = 5.0;
-const double U_py = 0.0;
-const double U_pz = 0.0;
+ double pos_y = 30.0;
+double pos_z = 5.0;
+ double U_py = 0.0;
+ double U_pz = 0.0;
 double U_p;
 vector <array<double, 8>> temporaryContent;
 vector <double> timeContent;
@@ -47,7 +47,7 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
     double U_px1, U_py1, Widerstand, REp;
     double Zeitpunkt = 0.0;
         
-    for(Zeitpunkt ; Zeitpunkt <Zeitpunktmax ; ){
+
     if(U_px0 <= U_max){
             
         }
@@ -63,7 +63,7 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
         REp = Re_von_Partikel(U_px0, diameter);
         if(REp <= 0){             
             cout << "Fehler und/oder es wird durch null geteilt!" << endl; 
-            break;
+
         }
         else if(REp <= 1000){
             Widerstand = (24.0/REp) * (1.0 + (1.0/6.0) * pow(REp, zweidurchdrei)); //Widerstand
@@ -113,7 +113,7 @@ if(pos_x0 >= 72.0){
     Cell_ID = Hilfe_y * AnzC_x + Hilfe_x;
     cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: " << Cell_ID << endl;
 temporaryArray[7] = Cell_ID;
-    break;
+
 }
     int Hilfe_x = (pos_x0 / C_dist_x);
     int Hilfe_y = (pos_y / C_dist_y);
@@ -121,7 +121,7 @@ temporaryArray[7] = Cell_ID;
 temporaryArray[7] = Cell_ID;
 if(Cell_ID > 17){
     cout << "Das Partikel hat den Auswertungsbereich verlassen!" << endl;
-    break;
+
 }
 
 if(abs(fmod(pos_x0 , C_dist_x)) == 0.0 || abs(fmod(pos_y, C_dist_y) == 0.0)){  
@@ -133,7 +133,7 @@ if(abs(fmod(pos_x0 , C_dist_x)) == 0.0 || abs(fmod(pos_y, C_dist_y) == 0.0)){
     Zeitpunkt += deltaT;
     temporaryContent.push_back(temporaryArray);
     timeContent.push_back(Zeitpunkt);
-}
+
    //Übergabe der Partikeldaten
     for (int i = 0; i < temporaryContent.size() ; i++) {
         for (int j = 0; j < 8; j++) {
@@ -168,7 +168,7 @@ int control(){ //Dient nur zur Kontrolle, kann bzw muss später entfernt werden
 
 Partikel_Eigenschaften Partikel1 ;                                   //                        
 Partikel1.Re_von_Partikel(U_px, diameter);               //Zeile 129 - 131 nicht loeschen!
-Partikel1.U_und_pos_von_Partikel(U_px, pos_x, U_py, pos_y, U_pz, pos_z);                       //
+//Partikel1.U_und_pos_von_Partikel(U_px, pos_x, U_py, pos_y, U_pz, pos_z);                       //
     
     return 0;
 }

@@ -137,10 +137,11 @@ FoamFile
     location    ")"<<FolderNumberStr<<R"(/lagrangian/kinematicCloud";
     object      )"<<fileName<<R"(;
 }
-        // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 )"<<kinematicLine<<R"(
-()";
+(
+)";
     for (int i = 0; i < kinematicLine; i++) {
         if (fileName == "positions"){
             File<<"("<< kinematicContent[i][4]<<" "<<kinematicContent[i][5]<<" "<<kinematicContent[i][6]<<")"<<kinematicContent[i][7];
@@ -155,9 +156,10 @@ FoamFile
             File<< "("<<RePartikel<<")";
         }
     }
-        File<<R"()
+        File<<R"(
+)
 
-        // ************************************************************************* //
+// ************************************************************************* //
         )";
     File.close();
         cout << fileName << endl;

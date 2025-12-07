@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <iostream>
 #include "GeleseneDatenC.h"
-#include "Particle.h"
+#include "ParticleV-Edition.h"
 using namespace std;                                                                                                    //alle genutzen variablen werden hier deklariert
 bool DevMode=false;
 int LineNumber[4];
@@ -18,6 +18,7 @@ float PhysVar1;
 float PhysVar2;
 int IsTropfenOrFoam;
 bool MinorErrorIsThere = false;
+int Ptime;
 
 string getfolder() {
     filesystem::path Filepath = filesystem::current_path();   //Ordnerpath findet den ordnerpfad und setzt Ordnerpath als diesen
@@ -65,9 +66,12 @@ int main() {
         FieldData.PrintValue();
     }
     if (IsTropfenOrFoam==1) {
-        ParticleData.increaseTime();
-        FolderNumber=to_string(ParticleData.GiveTime()*0.5);
-        GeleseneDatenC FieldData(getfolder(), FolderNumber, DevMode);
+        while (Ptime<11) {
+            ParticleData.increaseTime();
+            FolderNumber=to_string(ParticleData.GiveTime()*0.5);
+            Ptime=ParticleData.GiveTime();
+            GeleseneDatenC FieldData(getfolder(), FolderNumber, DevMode);
+        }
     }
     // Fehlerbehandlung: Wenn ein Fehler aufgetreten ist
     // Rückgabewert des Programms

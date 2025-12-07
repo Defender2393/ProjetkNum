@@ -29,7 +29,7 @@ double temptransfer;
 class Partikel_Eigenschaften{
 
 public:
-double Re_von_Partikel(double rho_c, double U_p, double diameter, double eta){
+double Re_von_Partikel(double U_p, double diameter){
     Reynolds = (rho_c * U_p * diameter)/eta;
         return Reynolds;
 }
@@ -51,7 +51,7 @@ double U_und_pos_von_Partikel(double U_px, double pos_x){
             
         }
         cout << "|U_p|: " << U_px0 << " Zum Zeitpunkt " << Zeitpunkt << endl;
-    REp = Re_von_Partikel(rho_c, U_px0, diameter, eta);
+    REp = Re_von_Partikel(U_px0, diameter);
         if(REp <= 0){             
             cout << "Fehler und/oder es wird durch null geteilt!" << endl; 
             break;
@@ -128,7 +128,7 @@ if(abs(fmod(pos_x0 , C_dist_x)) == 0.0 || abs(fmod(pos_y0, C_dist_y) == 0.0)){
    for (int i = 0; i < temporaryContent.size() ; i++) {
             for (int j = 0; j < 8; j++) {
 
-                temptransfer = temporaryArray[i][j];
+                temptransfer = temporaryContent[i][j];
                 return temptransfer;
             }
         
@@ -139,7 +139,7 @@ if(abs(fmod(pos_x0 , C_dist_x)) == 0.0 || abs(fmod(pos_y0, C_dist_y) == 0.0)){
 };
 
 
-int main(){ //Dient nur zur Kontrolle, kann bzw muss später entfernt werden
+int control(){ //Dient nur zur Kontrolle, kann bzw muss später entfernt werden
     cout << "Herzlich Willkommen zur Probeversion des Programms zur Berechnung von der Geschwindigkeit, Position und der Host-ID eines Partikels" << endl;
     cout << "Geben Sie eine Anfangsgeschwindigkeit in x-Richtung an: ";
     cin >> U_px;
@@ -152,7 +152,7 @@ int main(){ //Dient nur zur Kontrolle, kann bzw muss später entfernt werden
     cin >> pos_y;
 
 Partikel_Eigenschaften Partikel1 ;                                   //                        
-Partikel1.Re_von_Partikel(rho_c, U_px, diameter, eta);               //Zeile 129 - 131 nicht loeschen!
+Partikel1.Re_von_Partikel(U_px, diameter);               //Zeile 129 - 131 nicht loeschen!
 Partikel1.U_und_pos_von_Partikel(U_px, pos_x);                       //
     
     return 0;

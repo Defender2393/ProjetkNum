@@ -18,6 +18,7 @@ class Particle {
     string Folder;
     string Number;
     int TimeSteps;
+    double RePartikel;
     vector <array<double, 8>> temporaryContent;
     public:
     Particle(string getfolder, string FolderNumberstr,bool DevMode) {
@@ -124,15 +125,19 @@ FoamFile
 )"<<kinematicLine<<R"(
 ()";
     for (int i = 0; i < kinematicLine; i++) {
-        if (fileName == "U"){
+        if (fileName == "positions"){
             File<<"("<< kinematicContent[i][4]<<" "<<kinematicContent[i][5]<<" "<<kinematicContent[i][6]<<")"<<kinematicContent[i][7];
         }
-        if (fileName == "d"){
+        else if (fileName == "d"){
             File<<"("<< kinematicContent[i][3]<<")";
         }
-        if (fileName == "U"){
+        else if (fileName == "U"){
             File<<"("<< kinematicContent[i][0]<<" "<<kinematicContent[i][1]<<" "<<kinematicContent[i][2]<<")";
-    }}
+    }
+        else if (fileName == "Re") {
+            File<< "("<<RePartikel<<")";
+        }
+    }
         File<<R"()
 
         // ************************************************************************* //
@@ -142,7 +147,7 @@ FoamFile
     void increaseTime() {
         
         Partikel_Eigenschaften Partikel1;
-        Partikel1.Re_von_Partikel();        //Argumente ergänzen
+        RePartikel = Partikel1.Re_von_Partikel();        //Argumente ergänzen
 
      
         for (int i = 0; i < kinematicLine; i++) {
@@ -154,7 +159,7 @@ FoamFile
         double Fldrhelp= 0.5*TimeSteps;
         string FldrNumber=std::to_string(Fldrhelp);
         //hier werdem die neuem dateipunkte hinnzugefügt werden#
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             string temp;
             if (i == 0) {
                 temp = "U";
@@ -164,6 +169,9 @@ FoamFile
             }
             else if (i == 2) {
                 temp="positions";
+            }
+            else if (i == 3) {
+                temp = "Re";
             }
             CreateFile(Folder,FldrNumber,temp);
         }

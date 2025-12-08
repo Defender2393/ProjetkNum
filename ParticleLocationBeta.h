@@ -52,7 +52,7 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
             
         }
         cout << "|U_p|: " << U_px0 << " Zum Zeitpunkt " << Zeitpunkt << endl;
-    
+        //wiederstand muss noch vorher berechnet werden
         if(U_px0 == 0.0){
 
             tau = 4.0 / 3.0 * (rho_p * pow(diameter, 2)) / (eta * REp * Widerstand);

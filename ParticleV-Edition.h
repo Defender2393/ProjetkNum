@@ -108,13 +108,18 @@ public:
 
     void CreateFile(string getfolder,string FolderNumberStr,string fileName) {
             // Build the full path
-            string dirPath = getfolder + "\\Fallender_Tropfen\\" + FolderNumberStr + R"(\uniform\lagrangian\kinematicCloud\)";
+
+            string dirPath = getfolder + "\\Fallender_Tropfen\\" + FolderNumberStr + R"(\lagrangian\kinematicCloud\)";
 
             // Create all directories in the path if they don't exist
             ofstream File;
 
 
             File.open(dirPath + fileName);
+        if (!File.is_open()) {
+            filesystem::create_directories(dirPath);
+            File.open(dirPath + fileName);
+        }
 
             if (!File.is_open()) {
                 cout << "Error opening file: " << dirPath + fileName << endl;

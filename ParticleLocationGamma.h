@@ -63,10 +63,19 @@ double Re_von_Partikel(double U_px, double U_cx, double diameter){
     }
     */
 
-double Relax_von_Partikel(double RE, double rho_p, double diameter, double eta){//Relaxationszahl, aber der Kehrwert berechnet aus der Formelsammlung, außerdem wurde gleichung 8 in 11 eingesetzt, sodass sich Re rauskürzt
+double tau_von_Partikel(double RE, double rho_p, double diameter, double eta) {
+    //Relaxationszahl, aber der Kehrwert berechnet aus der Formelsammlung, außerdem wurde gleichung 8 in 11 eingesetzt, sodass sich Re rauskürzt
 
-    tau =  (4.0 * rho_p * pow(diameter, 2)) / (72.0 * eta * (1 + (1.0/6.0) * pow(RE, zweidurchdrei)));
-        return tau;
+    if (RE==0){
+        tau =  (4.0 * rho_p * pow(diameter, 2)) / (72.0 * eta * (1 + (1.0/6.0) * pow(RE, 2.0/3.0)));
+
+    }
+    else if (RE<=1000){
+        Widerstand = (24.0/RE) * (1.0 + (1.0/6.0) * pow(RE, zweidurchdrei));
+        tau = 4.0 / 3.0 * (rho_p * pow(diameter, 2)) / (eta * RE * Widerstand); //Relaxationszahl, aber der Kehrwert berechnet aus der Formelsammlung
+
+        }
+    return tau;
 }
 
 
@@ -95,9 +104,8 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
 
 
         
-    RE = Re_von_Partikel(U_px, U_cx, diameter);
-                                
-    U_px1 = U_px + ((abs(U_cx - U_px) / Relax_von_Partikel(RE, rho_p, diameter, eta)) + g * (1 - (rho_c / rho_p)) * (dT / (1 + (dT / Relax_von_Partikel(RE, rho_p, diameter, eta))))); 
+    RE = Re_von_Partikel(U_px, 0, diameter);
+    U_px1 = U_px + ((((U_cx - U_px) / tau_von_Partikel(RE, rho_p, diameter, eta)) + (g * (1 - (rho_c / rho_p)))) * (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta)))));
         cout << "----------------------------------------------------------------------------------" << endl;                                                                                                                                                                     
         cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px0 << endl; 
         cout << "U_py zum Zeitpunkt " << Zeitpunkt <<": " << U_py << endl;
@@ -113,7 +121,7 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
 //============================================================================================================================Berechnung der Position beginnt hier         
                
         //pos_x1 = pos_x0 + U_px0 * dT;
-        pos_x1 = 0.5 * g * pow(Zeitpunkt, 2) + U_px * Zeitpunkt + pos_x;                                                                               
+        pos_x1 = 0.5 * g * pow(dT, 2) + U_px * Zeitpunkt + pos_x;
         
         cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x1<< endl; 
         cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y << endl;
@@ -164,13 +172,10 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
         timeContent.push_back(Zeitpunkt);    
     
     //Übergabe der Partikeldaten
-    for (int i = 0; i < temporaryContent.size() ; i++) {
-        for (int j = 0; j < 8; j++) {
 
                 return  temporaryContent;
 
-            }
-        }        
+
     } 
 
     //Übergabe der Zeitschritte

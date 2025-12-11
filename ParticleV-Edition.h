@@ -1,6 +1,6 @@
 #ifndef UNTITLED_PARTICLE_H
 #define UNTITLED_PARTICLE_H
-#include "ParticleLocationBeta.h"
+#include "ParticleLocationGamma.h"
 #include <vector>
 #include <array>
 #include <locale>
@@ -181,7 +181,7 @@ FoamFile
                 kinematicContent[i][j] = helper[i+TimeSteps][j];
             }
         }
-        RePartikel = Partikel1.Re_von_Partikel(kinematicContent[0][0],kinematicContent[0][3]);
+        RePartikel = Partikel1.Re_von_Partikel(kinematicContent[0][0],0,kinematicContent[0][3]);
         TimeSteps = TimeSteps + 1;
         double Fldrhelp= 0.5*TimeSteps;
         string FldrNumber=to_string(Fldrhelp);

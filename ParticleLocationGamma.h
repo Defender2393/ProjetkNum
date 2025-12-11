@@ -120,8 +120,8 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
         temporaryArray[2] = U_pz;
 //============================================================================================================================Berechnung der Position beginnt hier         
                
-        //pos_x1 = pos_x0 + U_px0 * dT;
-        pos_x1 = 0.5 * g * pow(dT, 2) + U_px * Zeitpunkt + pos_x;
+        pos_x1 = pos_x+ U_px * dT;
+        //pos_x1 = 0.5 * g * pow(dT, 2) + U_px * Zeitpunkt + pos_x;
         
         cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x1<< endl; 
         cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y << endl;
@@ -141,29 +141,26 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
         const int AnzC_x = 6; // Anzahl der Zellen in x-Richtung
         //const int AnzC_y = 3; // Anzahl der Zellen in y-Richtung
 
-    if(pos_x0 >= 72.0){
+    if(pos_x1 >= 72.0){
+        pos_x1 = 72.0;
+        temporaryArray[4] = pos_x1;
         cout << "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: " << U_px1 <<" zum Zeitpunkt " << Zeitpunkt - dT << endl;
         int Hilfe_x = (pos_x1 / C_dist_x);
         int Hilfe_y = (pos_y / C_dist_y);
-        Cell_ID = Hilfe_y * AnzC_x + Hilfe_x;
+        Cell_ID = Hilfe_y * AnzC_x + Hilfe_x-1;
         cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: " << Cell_ID << endl;
         temporaryArray[7] = Cell_ID;
-        exit(0);
-    }   
+    }
+    else {
         int Hilfe_x = (pos_x1 / C_dist_x);
         int Hilfe_y = (pos_y / C_dist_y);
         Cell_ID = Hilfe_y * AnzC_x + Hilfe_x;
 
         temporaryArray[7] = Cell_ID;
+    }
 
-    if(Cell_ID > 17){
-        cout << "Das Partikel hat den Auswertungsbereich verlassen!" << endl;
-        exit(0);
-        }
 
-    if(fmod(pos_x1 , C_dist_x) == 0.0 || fmod(pos_y, C_dist_y) == 0.0){  
-        cout << "Das Partikel befindet sich genau zwischen zwei Zellen!" << endl;
-        }
+
         cout << "Host_ID: " << Cell_ID << " zum Zeitpunkt " << Zeitpunkt <<  endl;
         cout << "----------------------------------------------------------------------------------" << endl;
     

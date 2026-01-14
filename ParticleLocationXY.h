@@ -46,7 +46,7 @@ array<double, 8> temporaryArray; //! 0,1,2 fuer Geschwindigkeiten / 3 fuer diame
 vector<double> timeContent;
 vector<array<double, 3>> temporaryUValue;
 
-
+GeleseneDatenC UWind;
 
 class Partikel_Eigenschaften{
 
@@ -87,13 +87,15 @@ double tau_von_Partikel(double RE, double rho_p, double diameter, double eta) { 
 }
 
 double WIND(int Cell_ID, double U_px1, double U_py1){
-    for(Raumrichtung = 0; Raumrichtung < 2; Raumrichtung++){
+    
+Raumrichtung = 0;
 
         if(Raumrichtung == 0){ //? x-Richtung 
         
             U_cx = temporaryUValue[Cell_ID][0];
 
             U_px1 = U_px1 + U_cx;
+                Raumrichtung++;
                 return U_px1;
         }
         else if(Raumrichtung == 1){ //? y-Rictung
@@ -103,7 +105,7 @@ double WIND(int Cell_ID, double U_px1, double U_py1){
             U_py1 = U_py1 + U_cy;
                 return U_py1;
         }
-    }
+    
 }
 
 int Cell_ID(double pos_x1, double pos_y1){
@@ -143,9 +145,9 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
         pos_x1 = pos_x + U_px * dT; //? Berechnung der Position in x
         pos_y1 = pos_y + U_py * dT; //? Berechnung der Position in y
 
-        cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x1<< endl; 
+        cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x1 << endl; 
         cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y1 << endl;
-        cout << "pos_z zum Zeitpunkt " << Zeitpunkt <<": " << pos_z << endl;
+        cout << "pos_z zum Zeitpunkt " << Zeitpunkt <<": " << pos_z  << endl;
         cout << "----------------------------------------------------------------------------------" << endl;
                                                    
         temporaryArray[3] = diameter;
@@ -156,14 +158,41 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
 //!============================================================================================================================Berechnung der Host-ID beginnt hier
         
     if(pos_x1 >= 72.0){
-        pos_x1 = 72.0;
-        temporaryArray[4] = pos_x1;
-        temporaryArray[5] = pos_y1;
+               
+    if(U_py1 > 0){
+        double alpha = atan(U_px1/U_py1);
+        double pos_x1_cut = pos_x1 - 72;
+        double beta = 90 - alpha;
+        double U_p_cut = pos_x1_cut / cos(beta);
+        double pos_y1_cut;
+        pos_y1_cut = sqrt(pow(U_p_cut, 2) - pow(pos_x1_cut,2));
+        double pos_y1_real = pos_y1 - pos_y1_cut;
+        temporaryArray[4] = 72;
+        temporaryArray[5] = pos_y1_real;
+        temporaryArray[7] = Cell_ID(pos_x1 - 0.1, pos_y1_real);
+        
+    }else if (U_py1 < 0){
+        double alpha = atan(U_px1/U_py1);
+        double pos_x1_cut = pos_x1 - 72;
+        double beta = 90 - alpha;
+        double U_p_cut = pos_x1_cut / cos(beta);
+        double pos_y1_cut;
+        pos_y1_cut = sqrt(pow(U_p_cut, 2) - pow(pos_x1_cut,2));
+        double pos_y1_real = pos_y1 + pos_y1_cut; // Da in "andere" Richtung ueberschritten
+        temporaryArray[4] = 72; 
+        temporaryArray[5] = pos_y1_real;
+        temporaryArray[7] = Cell_ID(pos_x1 - 0.1, pos_y1_real);
+    }else if (U_py1 == 0){
+
+        temporaryArray[4] = 72;
+
+        }
+
         temporaryArray[0] = 0.0; //? Geschwindigkeit bei dem Erreichen der Auswertungsebene wird null
         temporaryArray[1] = 0.0;
         cout << "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: " << U_px1 <<" zum Zeitpunkt " << Zeitpunkt - dT << endl;
         cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: " << Cell_ID(pos_x1, pos_y1) << endl;       
-        temporaryArray[7] = Cell_ID(pos_x1 - 0.1, pos_y1);
+        
     }
     else if(pos_x1 <= 0.0){
         pos_x1 = 0.0;
@@ -180,7 +209,6 @@ cout<< "Partikel klebt an der Decke" << endl;
         temporaryArray[5] = pos_y1;
         temporaryArray[0] = 0.0; 
         temporaryArray[1] = 0.0;
-        
 cout << "Raum wird in negativer y-Richtung verlassen" << endl;
         temporaryArray[7] = Cell_ID(pos_x1, pos_y1 + 0.1);
     }

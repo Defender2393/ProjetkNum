@@ -80,7 +80,7 @@ double tau_von_Partikel(double RE, double rho_p, double diameter, double eta) {
 
 
 
-vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double U_pz, double pos_x, double pos_y, double pos_z){
+vector<array<double, 8>> U_und_pos_von_Partikel(array<double, 8> temporaryArray){
     
     //Hier erfolgt eine Ueberschreibung!
     //double U_px0 = U_px;
@@ -106,11 +106,11 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
         
     RE = Re_von_Partikel(U_px, 0, diameter);
     U_px1 = U_px + ((((U_cx - U_px) / tau_von_Partikel(RE, rho_p, diameter, eta)) + (g * (1 - (rho_c / rho_p)))) * (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta)))));
-        cout << "----------------------------------------------------------------------------------" << endl;                                                                                                                                                                     
-        cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px0 << endl; 
-        cout << "U_py zum Zeitpunkt " << Zeitpunkt <<": " << U_py << endl;
-        cout << "U_pz zum Zeitpunkt " << Zeitpunkt <<": " << U_pz << endl;
-        cout << "----------------------------------------------------------------------------------" <<endl;
+   //     cout << "----------------------------------------------------------------------------------" << endl;
+     //   cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px0 << endl;
+//        cout << "U_py zum Zeitpunkt " << Zeitpunkt <<": " << U_py << endl;
+  //      cout << "U_pz zum Zeitpunkt " << Zeitpunkt <<": " << U_pz << endl;
+    //    cout << "----------------------------------------------------------------------------------" <<endl;
         
         //Hier erfolgt eine Ueberschreibung!
         //U_px0 = U_px1;
@@ -123,10 +123,10 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
         pos_x1 = pos_x+ U_px * dT;
         //pos_x1 = 0.5 * g * pow(dT, 2) + U_px * Zeitpunkt + pos_x;
         
-        cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x1<< endl; 
-        cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y << endl;
-        cout << "pos_z zum Zeitpunkt " << Zeitpunkt <<": " << pos_z << endl;
-        cout << "----------------------------------------------------------------------------------" << endl;
+  //      cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x1<< endl;
+    //    cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y << endl;
+      //  cout << "pos_z zum Zeitpunkt " << Zeitpunkt <<": " << pos_z << endl;
+        //cout << "----------------------------------------------------------------------------------" << endl;
         
         //Hier erfolgt eine Ueberschreibung!
         //pos_x0 = pos_x1;                                 
@@ -144,12 +144,13 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
     if(pos_x1 >= 72.0){
         pos_x1 = 72.0;
         temporaryArray[4] = pos_x1;
-        cout << "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: " << U_px1 <<" zum Zeitpunkt " << Zeitpunkt - dT << endl;
+   //     cout << "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: " << U_px1 <<" zum Zeitpunkt " << Zeitpunkt - dT << endl;
         int Hilfe_x = (pos_x1 / C_dist_x);
         int Hilfe_y = (pos_y / C_dist_y);
         Cell_ID = Hilfe_y * AnzC_x + Hilfe_x-1;
-        cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: " << Cell_ID << endl;
+    //    cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: " << Cell_ID << endl;
         temporaryArray[7] = Cell_ID;
+        temporaryArray[0] = 0;
     }
     else {
         int Hilfe_x = (pos_x1 / C_dist_x);
@@ -161,8 +162,8 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
 
 
 
-        cout << "Host_ID: " << Cell_ID << " zum Zeitpunkt " << Zeitpunkt <<  endl;
-        cout << "----------------------------------------------------------------------------------" << endl;
+   //     cout << "Host_ID: " << Cell_ID << " zum Zeitpunkt " << Zeitpunkt <<  endl;
+     //   cout << "----------------------------------------------------------------------------------" << endl;
     
         Zeitpunkt += dT;
         temporaryContent.push_back(temporaryArray);

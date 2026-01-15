@@ -21,11 +21,18 @@ class GeleseneDatenC {
     vector<array<double, 3>> UContent;
     string Folder;
     string Number;
+    string FolderName;
 public:
 
 
-    GeleseneDatenC(string getfolder,string FolderNumberstr,bool DevMode) {
+    GeleseneDatenC(string getfolder,string FolderNumberstr,bool DevMode, int TropfenorSpray) {
         Folder = getfolder;
+        if (TropfenorSpray==2) {
+        FolderName = "Spray";
+        }
+        else {
+        FolderName = "Fallender_Tropfen";
+        }
         Dev=DevMode;
         Number = FolderNumberstr;
         char Character;
@@ -33,10 +40,10 @@ public:
             if (z==0) {
                 Character = 'C';
             }
-    File.open(getfolder+"\\Fallender_Tropfen\\"+FolderNumberstr+"\\"+Character);                                     //öffnet den ordner Fallender Tropfen\ Nummer des Ordners + C oder U in diesem
+    File.open(getfolder+"\\"+FolderName+"\\"+FolderNumberstr+"\\"+Character);                                     //öffnet den ordner Fallender Tropfen\ Nummer des Ordners + C oder U in diesem
         File.imbue(std::locale::classic());
         if (!File.is_open()&&DevMode==true&&ErrorIsThere==false) {                                                     //wenn die Datei nicht geöffntet werden kann und der DevMode an ist gibt es einen Error aus
-       cout << "Error in opening file, have you checked weather the Ordner you want opened has the intended Name" << endl;
+       cout << "Error in opening file, have you checked if the Ordner you want opened has the intended Name" << endl;
         ErrorIsThere = true;
     }
             if (DevMode==true) {
@@ -71,7 +78,7 @@ public:
     };
 public:
     void PrintValue() {
-        cout << " Ausgabe der daten aus " << Folder << "\\FallenderTropfen\\" << Number << "\\C" << endl;
+        cout << " Ausgabe der daten aus " << Folder << +"\\"+FolderName+"\\"<< Number << "\\C" << endl;
 
 
                 // Erste Datengruppe ausgeben
@@ -83,7 +90,7 @@ public:
                 }
 
 
-        cout << "Ausgabe der daten aus " << Folder << "\\FallenderTropfen\\" << Number << "\\U" << endl;
+        cout << "Ausgabe der daten aus " << Folder << +"\\"+FolderName+"\\" << Number << "\\U" << endl;
 
                 // Erste Datengruppe ausgeben
                 for (int i = 0; i < LineNumber[1]; i++) {

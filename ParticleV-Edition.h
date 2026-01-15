@@ -23,6 +23,7 @@ class Particle {
     string Number;
     int TimeSteps = 0;
     double RePartikel;
+    string FolderName;
     vector <array<double, 8>> particletxt;
     vector <array<double, 8>> temporaryContent;
     string namesofFilesTrofpen[22]{"0.5","1","1.5","2","2.5","3","3.5","4","4.5","5","5.5","6","6.5","7","7.5","8","8.5","9","9.5","10","10.5","11"};
@@ -32,7 +33,13 @@ class Particle {
         Folder = getfolder;
         Dev=DevMode;
         Number = FolderNumberstr;
-        File.open(getfolder+"\\Fallender_Tropfen\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\U)");       //öffnet die lagranian dateien und extrahier hier
+        if (SprayorTropfen==2) {
+            FolderName="Spray";
+        }
+        else  {
+            FolderName="Fallender_Tropfen";
+        }
+        File.open(getfolder+"\\"+FolderName+"\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\U)");       //öffnet die lagranian dateien und extrahier hier
     File.imbue(locale::classic());                                                                                 //locale::classic setzt die spracheinstellungen auf classic dass floats gelesen werden können
     string line;
     while (getline(File, line))                                                                                    //solange noch zeilen in datei liest diese
@@ -62,7 +69,7 @@ class Particle {
     }
     File.close();
 
-    File.open(getfolder+"\\Fallender_Tropfen\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\d)");                //öffnet das d file
+    File.open(getfolder+"\\"+FolderName+"\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\d)");                //öffnet das d file
     File.imbue(std::locale::classic());
     if (!File.is_open()) {                                                                                             //wenn kein file geöffnet wird gibt errorcode aus und ein minor error flag
         cout << "Error opening d file!" << endl;
@@ -85,7 +92,7 @@ class Particle {
     File.close();
 
     //laest positions auf dem ueblichen weg aus
-    File.open(getfolder+"\\Fallender_Tropfen\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\positions)");
+    File.open(getfolder+"\\"+FolderName+"\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\positions)");
     File.imbue(std::locale::classic());
     File.ignore(numeric_limits<streamsize>::max(), '(');                                                       //typische operation um auszulesen
     for (int i = 0; i < kinematicLine; i++) {
@@ -107,7 +114,7 @@ class Particle {
 public:
     void PrintValue() {
         cout << fixed;
-        cout << "Ausgabe der" << Folder << "\\FallenderTropfen\\" << Number << "\\lagrangian\\kinematicCloud daten" << endl;
+        cout << "Ausgabe der" << Folder << FolderName<< Number << "\\lagrangian\\kinematicCloud daten" << endl;
             // Kinematik-Daten ausgeben
             for (int i = 0; i < kinematicLine; i++) {
                 for (int j = 0; j < 8; j++) {
@@ -121,7 +128,7 @@ public:
     void CreateFile(string getfolder,string FolderNumberStr,string fileName) {
             // Build the full path
 
-            string dirPath = getfolder + "\\Fallender_Tropfen\\" + FolderNumberStr + R"(\lagrangian\kinematicCloud\)";
+            string dirPath = getfolder +"\\"+FolderName+"\\" + FolderNumberStr + R"(\lagrangian\kinematicCloud\)";
 
             // Create all directories in the path if they don't exist
             ofstream File;
@@ -205,7 +212,7 @@ FoamFile
                     kinematicContent[kinematicLine][4]=particletxt[i][1];
                     kinematicContent[kinematicLine][5]=particletxt[i][2];
                     kinematicContent[kinematicLine][6]=particletxt[i][3];
-            }
+                }
             }
 
             TimeSteps = TimeSteps + 1;
@@ -229,10 +236,11 @@ FoamFile
                 CreateFile(Folder,namesofFilesTrofpen[TimeSteps-1],temp);
             }
         }
+    }
         int GiveTime() {
             return TimeSteps;
         }
-    }
+
 };
 
 

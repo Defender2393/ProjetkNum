@@ -1,6 +1,6 @@
 #ifndef UNTITLED_PARTICLE_H
 #define UNTITLED_PARTICLE_H
-#include "ParticleLocationGamma.h"
+#include "ParticleLocationXY.h"
 #include <vector>
 #include <array>
 #include <locale>
@@ -189,21 +189,23 @@ FoamFile
         cout << fileName << endl;
     }
 
-    void increaseTime() {
+    void increaseTime( vector<array<double,3>> UCell) {
         //Argumente ergänzen
         Partikel_Eigenschaften Partikel1;
         for (int i = 0; i < kinematicLine; i++) {
-            helper= Partikel1.U_und_pos_von_Partikel(kinematicContent[i]);
+            RePartikel = Partikel1.Re_von_Partikel(kinematicContent[i][4],kinematicContent[i][5],UCell[i][0],UCell[i][1],kinematicContent[i][3]);
+            helper= Partikel1.U_und_pos_von_Partikel(kinematicContent[i][0],kinematicContent[i][1],kinematicContent[i][2],kinematicContent[i][4],kinematicContent[i][5],kinematicContent[i][6],kinematicContent[i][3]);
 
             for (int j = 0; j < 8; j++) {
                 kinematicContent[i][j] = helper[i+TimeSteps][j];
             }
         }
-        RePartikel = Partikel1.Re_von_Partikel(kinematicContent[0][0],0,kinematicContent[0][3]);
+
         if (Spray) {
             setprecision(2);
             for (int i = 0; i < 50; i++) {
                 if ((TimeSteps*0.02)==particletxt[i][0]) {
+                    kinematicLine++;
                     kinematicContent.push_back(array<double, 8>());
                     kinematicContent[kinematicLine][0]=particletxt[i][4];
                     kinematicContent[kinematicLine][1]=particletxt[i][5];
@@ -212,6 +214,7 @@ FoamFile
                     kinematicContent[kinematicLine][4]=particletxt[i][1];
                     kinematicContent[kinematicLine][5]=particletxt[i][2];
                     kinematicContent[kinematicLine][6]=particletxt[i][3];
+                    kinematicContent[kinematicLine][7]=Partikel1.Cell_ID(kinematicContent[kinematicLine][4],kinematicContent[kinematicLine][5]);
                 }
             }
 
@@ -233,7 +236,13 @@ FoamFile
                 else if (i == 3) {
                     temp = "Re";
                 }
-                CreateFile(Folder,namesofFilesTrofpen[TimeSteps-1],temp);
+                if (Spray) {
+                    CreateFile(Folder,namesofFilesSpray[TimeSteps-1],temp);
+
+                }
+                else {
+                    CreateFile(Folder,namesofFilesTrofpen[TimeSteps-1],temp);
+                }
             }
         }
     }

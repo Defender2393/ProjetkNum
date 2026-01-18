@@ -77,6 +77,9 @@ public:
 
     };
 public:
+    vector<array<double,3>> Content() {
+        return UContent;
+    }
     void PrintValue() {
         cout << " Ausgabe der daten aus " << Folder << +"\\"+FolderName+"\\"<< Number << "\\C" << endl;
 

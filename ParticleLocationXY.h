@@ -2,8 +2,6 @@
 #include <cmath>
 #include <vector>
 #include <array>
-#include "GeleseneDatenC.h"
-#include "ParticleV-Edition"
 using namespace std;
 
 //! Die Ausrufe-und Fragezeichen dienen zur Aenderung der Farbe der Comments, also nicht wundern
@@ -28,7 +26,7 @@ double pos_z =  5.0;    //TODO nur z bleibt konstant
 
 //!-------------------------------------
 
-const double diameter; //! in MS3 nicht mehr konstant, kann aber zur Kontrolle 0.02 vorerst bleiben
+//const double diameter; //! in MS3 nicht mehr konstant, kann aber zur Kontrolle 0.02 vorerst bleiben
 const double g = 9.81;
 const double rho_c = 1.199;
 const double rho_p = 998.207;
@@ -47,9 +45,9 @@ array<double, 8> temporaryArray; //! 0,1,2 fuer Geschwindigkeiten / 3 fuer diame
 vector<double> timeContent;
 vector<array<double, 3>> temporaryUValue;
 
-Particle Particle1Transf;   //mit Klasse aus ParticleV-Edition2.h
+//Particle Particle1Transf;   //mit Klasse aus ParticleV-Edition2.h
 
-diameter = Particle1Transf.GiveDiameter();
+//diameter = Particle1Transf.GiveDiameter();
 
 class Partikel_Eigenschaften{
 
@@ -126,9 +124,10 @@ int Cell_ID(double pos_x1, double pos_y1){
 }
 
 //? Geschwindigkeiten und Positionen
-vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double U_pz, double pos_x, double pos_y, double pos_z){
+vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double U_pz, double pos_x, double pos_y, double pos_z,double diameter){
     
         double Zeitpunkt = 0.0;
+
 
         RE = Re_von_Partikel(U_px, U_py, U_cx, U_cy, diameter);
         U_px1 = U_px + ((((U_cx - U_px) / tau_von_Partikel(RE, rho_p, diameter, eta)) + (g * (1 - (rho_c / rho_p)))) * (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta)))));

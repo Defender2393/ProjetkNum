@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 #include "GeleseneDatenC.h"
+#include "ParticleV-Edition"
 using namespace std;
 
 //! Die Ausrufe-und Fragezeichen dienen zur Aenderung der Farbe der Comments, also nicht wundern
@@ -27,7 +28,7 @@ double pos_z =  5.0;    //TODO nur z bleibt konstant
 
 //!-------------------------------------
 
-const double diameter = 0.02; //! in MS3 nicht mehr konstant, kann aber zur Kontrolle 0.02 vorerst bleiben
+const double diameter; //! in MS3 nicht mehr konstant, kann aber zur Kontrolle 0.02 vorerst bleiben
 const double g = 9.81;
 const double rho_c = 1.199;
 const double rho_p = 998.207;
@@ -46,7 +47,9 @@ array<double, 8> temporaryArray; //! 0,1,2 fuer Geschwindigkeiten / 3 fuer diame
 vector<double> timeContent;
 vector<array<double, 3>> temporaryUValue;
 
-GeleseneDatenC UWind;
+Particle Particle1Transf;   //mit Klasse aus ParticleV-Edition2.h
+
+diameter = Particle1Transf.GiveDiameter();
 
 class Partikel_Eigenschaften{
 

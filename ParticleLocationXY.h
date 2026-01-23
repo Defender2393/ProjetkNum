@@ -8,21 +8,16 @@ using namespace std;
 
 //!-------------------------------------
 
-double U_cx = 0.0;
-double U_cy = 0.0;      //? Geschwindigkeiten der Zelle
-double U_cz = 0.0;      //TODO kann nach der automatischen Uebergabe geloescht werden
+
 
 //!-------------------------------------
 
-double U_px, U_px0, U_px1, U_py0, U_py1; 
-double U_py = 0.0;      //? Geschwindigkeiten vom Partikel
-double U_pz = 0.0;      //TODO nur z bleibt null
+double  U_px0, U_px1, U_py0, U_py1;
+
 
 //!-------------------------------------
 
-double pos_x, pos_x0, pos_x1, pos_y0, pos_y1;
-double pos_y = 30.0;    //? Positionen vom Partikel
-double pos_z =  5.0;    //TODO nur z bleibt konstant
+double  pos_x0, pos_x1, pos_y0, pos_y1;
 
 //!-------------------------------------
 
@@ -32,7 +27,7 @@ const double rho_c = 1.199;
 const double rho_p = 998.207;
 const double zweidurchdrei = 2.0/3.0;
 const double eta = 1.824878*1e-5;
-const double dT = 0.5;
+const double dT = 0.02;
 double tau;
 double Reynolds, RE;
 double Widerstand;
@@ -64,8 +59,10 @@ double Betrag_von_U_von_Zelle(double U_cx, double U_cy){
 }
 
 //? ReynoldsZahl
-double Re_von_Partikel(double U_px, double U_py, double U_cx, double U_cy, double diameter){ 
-    Reynolds = (rho_c * abs(Betrag_von_U_von_Partikel(U_px, U_py) - Betrag_von_U_von_Zelle(U_cx, U_cy)) * diameter) / eta;
+double Re_von_Partikel(double U_px, double U_py, double U_cx, double U_cy, double diameter){
+    U_px=U_px - U_cx;
+    U_py=U_py - U_cy;
+    Reynolds = (rho_c * abs(Betrag_von_U_von_Partikel(U_px, U_py)) * diameter) / eta;
             return Reynolds;
 }
 
@@ -87,27 +84,7 @@ double tau_von_Partikel(double RE, double rho_p, double diameter, double eta) { 
 
 }
 
-double WIND(int Cell_ID, double U_px1, double U_py1){
-    
-Raumrichtung = 0;
 
-        if(Raumrichtung == 0){ //? x-Richtung 
-        
-            U_cx = temporaryUValue[Cell_ID][0];
-
-            U_px1 = U_px1 + U_cx;
-                Raumrichtung++;
-                return U_px1;
-        }
-        else if(Raumrichtung == 1){ //? y-Rictung
-        
-            U_cy = temporaryUValue[Cell_ID][1];
-
-            U_py1 = U_py1 + U_cy;
-                return U_py1;
-        }
-    
-}
 
 int Cell_ID(double pos_x1, double pos_y1){
 
@@ -124,14 +101,24 @@ int Cell_ID(double pos_x1, double pos_y1){
 }
 
 //? Geschwindigkeiten und Positionen
-vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double U_pz, double pos_x, double pos_y, double pos_z,double diameter){
+array<double, 8> U_und_pos_von_Partikel(array<double, 8> data,double U_cx, double U_cy, int Timesteps){
+    if (data[4]==5){
+        temporaryArray=data;
+        return temporaryArray;
+
+    }
     
-        double Zeitpunkt = 0.0;
-
-
+        double Zeitpunkt = 0.02*Timesteps;
+        double diameter= data[3];
+        double U_px=data[0];
+        double U_py=data[1];
+         double   pos_x=data[4];
+        double pos_y=data[5];
+        double U_pz=data[2];
+        double pos_z=data[6];
         RE = Re_von_Partikel(U_px, U_py, U_cx, U_cy, diameter);
         U_px1 = U_px + ((((U_cx - U_px) / tau_von_Partikel(RE, rho_p, diameter, eta)) + (g * (1 - (rho_c / rho_p)))) * (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta)))));
-        U_py1 = U_py +   ((U_cy - U_py) / tau_von_Partikel(RE, rho_p, diameter, eta)); //? Keine Beschleunigung in y-Richtung
+        U_py1 = (U_py +   (((U_cy - U_py) / tau_von_Partikel(RE, rho_p, diameter, eta)))* (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta))))); //? Keine Beschleunigung in y-Richtung
         cout << "----------------------------------------------------------------------------------" << endl;                                                                                                                                                                     
         cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px0 << endl; 
         cout << "U_py zum Zeitpunkt " << Zeitpunkt <<": " << U_py1 << endl;
@@ -159,34 +146,34 @@ vector<array<double, 8>> U_und_pos_von_Partikel(double U_px, double U_py, double
 
 //!============================================================================================================================Berechnung der Host-ID beginnt hier
         
-    if(pos_x1 >= 72.0){
+    if(pos_x1 >= 5.0){
                
     if(U_py1 > 0){
         double alpha = atan(U_px1/U_py1);
-        double pos_x1_cut = pos_x1 - 72;
+        double pos_x1_cut = pos_x1 - 5;
         double beta = 90 - alpha;
         double U_p_cut = pos_x1_cut / cos(beta);
         double pos_y1_cut;
         pos_y1_cut = sqrt(pow(U_p_cut, 2) - pow(pos_x1_cut,2));
         double pos_y1_real = pos_y1 - pos_y1_cut;
-        temporaryArray[4] = 72;
+        temporaryArray[4] = 5;
         temporaryArray[5] = pos_y1_real;
         temporaryArray[7] = Cell_ID(pos_x1 - 0.1, pos_y1_real);
         
     }else if (U_py1 < 0){
         double alpha = atan(U_px1/U_py1);
-        double pos_x1_cut = pos_x1 - 72;
+        double pos_x1_cut = pos_x1 - 5;
         double beta = 90 - alpha;
         double U_p_cut = pos_x1_cut / cos(beta);
         double pos_y1_cut;
         pos_y1_cut = sqrt(pow(U_p_cut, 2) - pow(pos_x1_cut,2));
         double pos_y1_real = pos_y1 + pos_y1_cut; // Da in "andere" Richtung ueberschritten
-        temporaryArray[4] = 72; 
+        temporaryArray[4] = 5;
         temporaryArray[5] = pos_y1_real;
         temporaryArray[7] = Cell_ID(pos_x1 - 0.1, pos_y1_real);
     }else if (U_py1 == 0){
 
-        temporaryArray[4] = 72;
+        temporaryArray[4] = 5;
 
         }
 
@@ -209,8 +196,8 @@ cout<< "Partikel klebt an der Decke" << endl;
         pos_y1 = 0.0;
         temporaryArray[4] = pos_x1;
         temporaryArray[5] = pos_y1;
-        temporaryArray[0] = 0.0; 
-        temporaryArray[1] = 0.0;
+        temporaryArray[0] = 0.0;
+       temporaryArray[1] = 0.0;
 cout << "Raum wird in negativer y-Richtung verlassen" << endl;
         temporaryArray[7] = Cell_ID(pos_x1, pos_y1 + 0.1);
     }
@@ -218,7 +205,7 @@ cout << "Raum wird in negativer y-Richtung verlassen" << endl;
         pos_y1 = 13.0;
         temporaryArray[4] = pos_x1;
         temporaryArray[5] = pos_y1;
-        temporaryArray[0] = 0.0; 
+        temporaryArray[0] = 0.0;
         temporaryArray[1] = 0.0;
 cout << "Raum in positiver y-Richtung wird verlassen" << endl;
         temporaryArray[7] = Cell_ID(pos_x1, pos_y1 - 0.1);
@@ -235,7 +222,7 @@ cout << "Raum in positiver y-Richtung wird verlassen" << endl;
         timeContent.push_back(Zeitpunkt);    
     
     //? Uebergabe der Partikeldaten
-            return temporaryContent;
+            return temporaryArray;
     } 
 
     //? Uebergabe der Zeitschritte
@@ -246,22 +233,3 @@ cout << "Raum in positiver y-Richtung wird verlassen" << endl;
     }                    
 };
 
-//? Dient nur zur Kontrolle, kann bzw. muss spaeter entfernt werden
-int control(){ 
-    
-    cout << "Herzlich Willkommen zur Probeversion des Programms zur Berechnung von der Geschwindigkeit, Position und der Host-ID eines Partikels" << endl;
-    cout << "U_px: ";
-    cin >> U_px; 
-    cout << "U_py: ";
-    cin >> U_py;
-    cout << "pos_x: ";
-    cin >> pos_x;
-    cout << "pos_y: ";
-    cin >> pos_y;
-
-//! Partikel_Eigenschaften Partikel1;                                                                                   
-//! Partikel1.Re_von_Partikel(U_px, U_cx, diameter);                                                
-//! Partikel1.U_und_pos_von_Partikel(U_px, U_py, U_pz, pos_x, pos_y, pos_z);                        
-    
-    return 0;
-}

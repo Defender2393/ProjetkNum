@@ -49,7 +49,6 @@ public:
             if (DevMode==true) {
                 cout << Character<< endl;
             }
-            string token;
         File.ignore(1000,'>');
         File >> LineNumber[z];
             File.ignore(4,'(');
@@ -77,21 +76,36 @@ public:
 
     };
 public:
+    void ReadNewData(string getfolder, string FolderNumberstr, bool DevMode) {
+        UContent.clear();
+        char Character;
+                Character = 'U';
+
+            File.open(getfolder+"\\"+FolderName+"\\"+FolderNumberstr+"\\"+Character);                                     //öffnet den ordner Fallender Tropfen\ Nummer des Ordners + C oder U in diesem
+            File.imbue(std::locale::classic());
+            if (!File.is_open()&&DevMode==true&&ErrorIsThere==false) {                                                     //wenn die Datei nicht geöffntet werden kann und der DevMode an ist gibt es einen Error aus
+                cout << "Error in opening file, have you checked if the Ordner you want opened has the intended Name" << endl;
+                ErrorIsThere = true;
+            }
+            if (DevMode==true) {
+                cout << Character<< endl;
+            }
+            File.ignore(1000,'>');
+            File >> LineNumber[1];
+            File.ignore(4,'(');
+            for (int y = 0; y < LineNumber[1]; y++) {
+                File.ignore(4,'(');
+                    if (DevMode){cout <<y;}
+                    UContent.push_back(array<double, 3>{});
+                    File >> UContent[y][0] >> UContent[y][1] >> UContent[y][2];
+                }
+            File.close();
+
+    }
     vector<array<double,3>> Content() {
         return UContent;
     }
     void PrintValue() {
-        cout << " Ausgabe der daten aus " << Folder << +"\\"+FolderName+"\\"<< Number << "\\C" << endl;
-
-
-                // Erste Datengruppe ausgeben
-                for (int i = 0; i < LineNumber[0]; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        cout << CContent[i][j] << " ";
-                    }
-                    cout << endl;
-                }
-
 
         cout << "Ausgabe der daten aus " << Folder << +"\\"+FolderName+"\\" << Number << "\\U" << endl;
 

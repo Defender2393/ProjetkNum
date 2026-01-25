@@ -118,9 +118,9 @@ array<double, 8> U_und_pos_von_Partikel(array<double, 8> data,double U_cx, doubl
         U_py1 = (U_py +   (((U_cy - U_py) / tau_von_Partikel(RE, rho_p, diameter, eta)))* (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta))))); //? Keine Beschleunigung in y-Richtung
 if(DevMode){     
         cout << "----------------------------------------------------------------------------------" << endl;                                                                                                                                                                     
-        cout << "U_px zum Zeitpunkt " << /**/ <<": " << U_px0 << endl; 
-        cout << "U_py zum Zeitpunkt " << /**/ <<": " << U_py1 << endl;
-        cout << "U_pz zum Zeitpunkt " << /**/ <<": " << U_pz << endl;
+        cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px0 << endl; 
+        cout << "U_py zum Zeitpunkt " << Zeitpunkt <<": " << U_py1 << endl;
+        cout << "U_pz zum Zeitpunkt " << Zeitpunkt <<": " << U_pz << endl;
         cout << "----------------------------------------------------------------------------------" <<endl;      
 }
         temporaryArray[0] = U_px1;
@@ -132,9 +132,9 @@ if(DevMode){
         pos_x1 = pos_x + U_px * dT; //? Berechnung der Position in x
         pos_y1 = pos_y + U_py * dT; //? Berechnung der Position in y
 if(DevMode){
-        cout << "pos_x zum Zeitpunkt " << /**/ <<": " << pos_x1 << endl; 
-        cout << "pos_y zum Zeitpunkt " << /**/ <<": " << pos_y1 << endl;
-        cout << "pos_z zum Zeitpunkt " << /**/ <<": " << pos_z  << endl;
+        cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x1 << endl; 
+        cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y1 << endl;
+        cout << "pos_z zum Zeitpunkt " << Zeitpunkt <<": " << pos_z  << endl;
         cout << "----------------------------------------------------------------------------------" << endl;
 }                                       
         temporaryArray[3] = diameter;
@@ -178,7 +178,7 @@ if(DevMode){
         temporaryArray[0] = 0.0; //? Geschwindigkeit bei dem Erreichen der Auswertungsebene wird null
         temporaryArray[1] = 0.0;
 if(DevMode){
-        cout << "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: " << U_px1 <<" zum Zeitpunkt " << /**/ << endl;
+        cout << "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: " << U_px1 <<" zum Zeitpunkt " << Zeitpunkt << endl;
         cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: " << Cell_ID(pos_x1, pos_y1) << endl;       
 }    
     }
@@ -219,9 +219,10 @@ if(DevMode){
         temporaryArray[7] = Cell_ID(pos_x1, pos_y1);
     }
 if(DevMode){
-        cout << "Host_ID: " << Cell_ID(pos_x1, pos_y1) << " zum Zeitpunkt " << /**/ <<  endl;
+        cout << "Host_ID: " << Cell_ID(pos_x1, pos_y1) << " zum Zeitpunkt " << Zeitpunkt <<  endl;
         cout << "----------------------------------------------------------------------------------" << endl;
 }
+        Zeitpunkt += dT;
         temporaryContent.push_back(temporaryArray);
         timeContent.push_back(Zeitpunkt);    
     

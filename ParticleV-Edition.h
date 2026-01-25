@@ -198,8 +198,8 @@ FoamFile
             File<< "("<<RePartikel[i]<<")"<<endl;
         }
     }
-        File<<R"(
-)
+        File<<R"()
+
 
 // ************************************************************************* //
         )";
@@ -286,7 +286,9 @@ FoamFile
             else {
                 RePartikel[i] = Partikel1.Re_von_Partikel(kinematicContent[i][0],kinematicContent[i][1],UCell[kinematicContent[i][7]][0],UCell[kinematicContent[i][7]][1],kinematicContent[i][3]);
             }
+
         }
+        CreateFile(Folder,"2.8","Re");
     }
     void Auswertung(string getfolder) {
         array<double,26> Auswertung;

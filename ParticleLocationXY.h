@@ -35,14 +35,12 @@ double U_p, U_c;
 double temptransfer;
 int CELL_ID;
 int Raumrichtung;
+bool DevMode;
 vector <array<double, 8>> temporaryContent; 
 array<double, 8> temporaryArray; //! 0,1,2 fuer Geschwindigkeiten / 3 fuer diameter / 4,5,6 fuer Positionen / 7 fuer Cell_ID 
 vector<double> timeContent;
 vector<array<double, 3>> temporaryUValue;
 
-//Particle Particle1Transf;   //mit Klasse aus ParticleV-Edition2.h
-
-//diameter = Particle1Transf.GiveDiameter();
 
 class Partikel_Eigenschaften{
 
@@ -85,7 +83,6 @@ double tau_von_Partikel(double RE, double rho_p, double diameter, double eta) { 
 }
 
 
-
 int Cell_ID(double pos_x1, double pos_y1){
 
         const double C_dist_x = 0.2;   //? Kantenlaenge der Zelle in x-Richtung
@@ -119,12 +116,13 @@ array<double, 8> U_und_pos_von_Partikel(array<double, 8> data,double U_cx, doubl
         RE = Re_von_Partikel(U_px, U_py, U_cx, U_cy, diameter);
         U_px1 = U_px + ((((U_cx - U_px) / tau_von_Partikel(RE, rho_p, diameter, eta)) + (g * (1 - (rho_c / rho_p)))) * (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta)))));
         U_py1 = (U_py +   (((U_cy - U_py) / tau_von_Partikel(RE, rho_p, diameter, eta)))* (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta))))); //? Keine Beschleunigung in y-Richtung
+if(DevMode){     
         cout << "----------------------------------------------------------------------------------" << endl;                                                                                                                                                                     
-        cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px0 << endl; 
-        cout << "U_py zum Zeitpunkt " << Zeitpunkt <<": " << U_py1 << endl;
-        cout << "U_pz zum Zeitpunkt " << Zeitpunkt <<": " << U_pz << endl;
+        cout << "U_px zum Zeitpunkt " << /**/ <<": " << U_px0 << endl; 
+        cout << "U_py zum Zeitpunkt " << /**/ <<": " << U_py1 << endl;
+        cout << "U_pz zum Zeitpunkt " << /**/ <<": " << U_pz << endl;
         cout << "----------------------------------------------------------------------------------" <<endl;      
- 
+}
         temporaryArray[0] = U_px1;
         temporaryArray[1] = U_py1;
         temporaryArray[2] = U_pz;
@@ -133,12 +131,12 @@ array<double, 8> U_und_pos_von_Partikel(array<double, 8> data,double U_cx, doubl
                
         pos_x1 = pos_x + U_px * dT; //? Berechnung der Position in x
         pos_y1 = pos_y + U_py * dT; //? Berechnung der Position in y
-
-        cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x1 << endl; 
-        cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y1 << endl;
-        cout << "pos_z zum Zeitpunkt " << Zeitpunkt <<": " << pos_z  << endl;
+if(DevMode){
+        cout << "pos_x zum Zeitpunkt " << /**/ <<": " << pos_x1 << endl; 
+        cout << "pos_y zum Zeitpunkt " << /**/ <<": " << pos_y1 << endl;
+        cout << "pos_z zum Zeitpunkt " << /**/ <<": " << pos_z  << endl;
         cout << "----------------------------------------------------------------------------------" << endl;
-                                                   
+}                                       
         temporaryArray[3] = diameter;
         temporaryArray[4] = pos_x1;
         temporaryArray[5] = pos_y1;
@@ -171,7 +169,7 @@ array<double, 8> U_und_pos_von_Partikel(array<double, 8> data,double U_cx, doubl
         temporaryArray[4] = 5;
         temporaryArray[5] = pos_y1_real;
         temporaryArray[7] = Cell_ID(pos_x1 - 0.1, pos_y1_real);
-    }else if (U_py1 == 0){
+    }else if (U_py1 == 0){  //Derselbe Fall wie in Meilenstein 2
 
         temporaryArray[4] = 5;
 
@@ -179,9 +177,10 @@ array<double, 8> U_und_pos_von_Partikel(array<double, 8> data,double U_cx, doubl
 
         temporaryArray[0] = 0.0; //? Geschwindigkeit bei dem Erreichen der Auswertungsebene wird null
         temporaryArray[1] = 0.0;
-        cout << "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: " << U_px1 <<" zum Zeitpunkt " << Zeitpunkt - dT << endl;
+if(DevMode){
+        cout << "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: " << U_px1 <<" zum Zeitpunkt " << /**/ << endl;
         cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: " << Cell_ID(pos_x1, pos_y1) << endl;       
-        
+}    
     }
     else if(pos_x1 <= 0.0){
         pos_x1 = 0.0;
@@ -189,7 +188,9 @@ array<double, 8> U_und_pos_von_Partikel(array<double, 8> data,double U_cx, doubl
         temporaryArray[5] = pos_y1;
         temporaryArray[0] = 0.0; 
         temporaryArray[1] = 0.0;
-cout<< "Partikel klebt an der Decke" << endl;
+if(DevMode){
+        cout<< "Partikel klebt an der Decke" << endl;
+}
         temporaryArray[7] = Cell_ID(pos_x1 + 0.1, pos_y1);
     }
     else if(pos_y1 <= 0.0){
@@ -198,7 +199,9 @@ cout<< "Partikel klebt an der Decke" << endl;
         temporaryArray[5] = pos_y1;
         temporaryArray[0] = 0.0;
        temporaryArray[1] = 0.0;
-cout << "Raum wird in negativer y-Richtung verlassen" << endl;
+if(DevMode){
+        cout << "Raum wird in negativer y-Richtung verlassen" << endl;
+}
         temporaryArray[7] = Cell_ID(pos_x1, pos_y1 + 0.1);
     }
     else if(pos_y1 >= 13.0){
@@ -207,17 +210,18 @@ cout << "Raum wird in negativer y-Richtung verlassen" << endl;
         temporaryArray[5] = pos_y1;
         temporaryArray[0] = 0.0;
         temporaryArray[1] = 0.0;
-cout << "Raum in positiver y-Richtung wird verlassen" << endl;
+if(DevMode){
+        cout << "Raum in positiver y-Richtung wird verlassen" << endl;
+}
         temporaryArray[7] = Cell_ID(pos_x1, pos_y1 - 0.1);
     }
     else{        
         temporaryArray[7] = Cell_ID(pos_x1, pos_y1);
     }
-
-        cout << "Host_ID: " << Cell_ID(pos_x1, pos_y1) << " zum Zeitpunkt " << Zeitpunkt <<  endl;
+if(DevMode){
+        cout << "Host_ID: " << Cell_ID(pos_x1, pos_y1) << " zum Zeitpunkt " << /**/ <<  endl;
         cout << "----------------------------------------------------------------------------------" << endl;
-    
-        Zeitpunkt += dT;
+}
         temporaryContent.push_back(temporaryArray);
         timeContent.push_back(Zeitpunkt);    
     
@@ -232,4 +236,3 @@ cout << "Raum in positiver y-Richtung wird verlassen" << endl;
         }    
     }                    
 };
-

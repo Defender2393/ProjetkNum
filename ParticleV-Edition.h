@@ -12,40 +12,55 @@
 using namespace std;
 
 class Particle {
+    //Fehlerstatus
     bool ErrorIsThere = false;
+    //hilfscontainer
     vector<array<double,8>> helper;
+    vector <array<double, 8>> temporaryContent;
+    //Modusflags
     bool Spray = false;
-    int TimeHelper =1;
     bool Dev = false;
+    bool RePrint;
+    //Datei Handling
     ifstream File;
-    vector <array<double, 8>> kinematicContent;//pos 0-2 is for U, pos 3 for d pos 4-7 for posisitions
+    //Zeitverwaltung
+    int TimeHelper =1;
+    int TimeSteps = 0;
+//Partikelzustand
+    vector <array<double, 8>> kinematicContent; //pos 0-2 is for U, pos 3 for d pos 4-7 for posisitions
+    //Anzahl Partikel
     int kinematicLine;
+    //Pfade und Namen für schreiben der datein
     string Folder;
     string Number;
-    bool RePrint;
-    int TimeSteps = 0;
-    vector <double> RePartikel;
     string FolderName;
+    //Re-Zahlen
+    vector <double> RePartikel;
+//Spray initialdaten
     vector <array<double, 8>> particletxt;
-    vector <array<double, 8>> temporaryContent;
+    //Zeitstempel für Tropfen
     string namesofFilesTrofpen[22]{"0.5","1","1.5","2","2.5","3","3.5","4","4.5","5","5.5","6","6.5","7","7.5","8","8.5","9","9.5","10","10.5","11"};
+//Zeitstempel für Spray
     string namesofFilesSpray[141]{"0","0.02","0.04","0.06","0.08","0.1","0.12","0.14","0.16","0.18","0.2","0.22","0.24","0.26","0.28","0.3","0.32","0.34","0.36","0.38","0.4","0.42","0.44","0.46","0.48","0.5","0.52","0.54","0.56","0.58","0.6","0.62","0.64","0.66","0.68","0.7","0.72","0.74","0.76","0.78","0.8","0.82","0.84","0.86","0.88","0.9","0.92","0.94","0.96","0.98","1","1.02","1.04","1.06","1.08","1.1","1.12","1.14","1.16","1.18","1.2","1.22","1.24","1.26","1.28","1.3","1.32","1.34","1.36","1.38","1.4","1.42","1.44","1.46","1.48","1.5","1.52","1.54","1.56","1.58","1.6","1.62","1.64","1.66","1.68","1.7","1.72","1.74","1.76","1.78","1.8","1.82","1.84","1.86","1.88","1.9","1.92","1.94","1.96","1.98","2","2.02","2.04","2.06","2.08","2.1","2.12","2.14","2.16","2.18","2.2","2.22","2.24","2.26","2.28","2.3","2.32","2.34","2.36","2.38","2.4","2.42","2.44","2.46","2.48","2.5","2.52","2.54","2.56","2.58","2.6","2.62","2.64","2.66","2.68","2.7","2.72","2.74","2.76","2.78","2.8"};
     public:
+    //Konsturktor, liest OpenFoam datein des Partikels ein und setzt flags entsprechend
     Particle(string getfolder, string FolderNumberstr,bool DevMode,int SprayorTropfen, vector<array<double,3>> UCell,int PrintRe) {
         Folder = getfolder;
         RePrint=PrintRe;
         Dev=DevMode;
         Number = FolderNumberstr;
+        //Moduswahl
         if (SprayorTropfen==2) {
             FolderName="Spray";
         }
         else  {
             FolderName="Fallender_Tropfen";
         }
+//U-Datei öffnen und lesen, auslesen der Partikelzahl
         File.open(getfolder+"\\"+FolderName+"\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\U)");       //öffnet die lagranian dateien und extrahier hier
-    File.imbue(locale::classic());                                                                                 //locale::classic setzt die spracheinstellungen auf classic dass floats gelesen werden können
-    string line;
-    while (getline(File, line))                                                                                    //solange noch zeilen in datei liest diese
+         File.imbue(locale::classic());                                                                                 //locale::classic setzt die spracheinstellungen auf classic dass floats gelesen werden können
+         string line;
+          while (getline(File, line))                                                                                    //solange noch zeilen in datei liest diese
     {
         stringstream ss(line);                                                                                          //erstellt einen stream an strings aus der zeile(einfacher zu nutzen)
         if (ss >> kinematicLine)                                                                                        //versucht das erste wort aus der zeile in kinematicline zu lesen, kinematicline akzeptiert nur zahlen
@@ -71,7 +86,7 @@ class Particle {
         File >> kinematicContent[i][0] >> kinematicContent[i][1] >> kinematicContent[i][2];                            //liest wie gewohnt die daten aus
     }
     File.close();
-
+//d-Datei lesen
     File.open(getfolder+"\\"+FolderName+"\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\d)");                //öffnet das d file
     File.imbue(std::locale::classic());
     if (!File.is_open()) {                                                                                             //wenn kein file geöffnet wird gibt errorcode aus und ein minor error flag
@@ -94,7 +109,7 @@ class Particle {
     }
     File.close();
 
-    //laest positions auf dem ueblichen weg aus
+    //liest positions auf dem ueblichen weg aus
     File.open(getfolder+"\\"+FolderName+"\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\positions)");
     File.imbue(std::locale::classic());
     File.ignore(numeric_limits<streamsize>::max(), '(');                                                       //typische operation um auszulesen
@@ -105,13 +120,14 @@ class Particle {
         File >> kinematicContent[i][7];
     }
         File.close();
+        //Spray Zusatzdaten lesen
         if (SprayorTropfen==2) {
             Spray=true;
             File.open(getfolder+"\\Spray\\particles.txt");
             File.ignore(numeric_limits<streamsize>::max(), 'd');
             File.imbue(std::locale::classic());
             if (!File.is_open()) {
-                cout << "Error opening d file!" << endl;
+                cout << "Error opening particles.txt file!" << endl;
                 ErrorIsThere = true;
             }
             for (int i = 0; i < 50; i++) {
@@ -119,6 +135,7 @@ class Particle {
                 File >> particletxt[i][0] >> particletxt[i][1] >> particletxt[i][2]>>particletxt[i][3]>>particletxt[i][4]>>particletxt[i][5]>>particletxt[i][6]>>particletxt[i][7];
             }
         }
+        //Initiale Re berechnung bei Spray
         if (Spray) {
             Partikel_Eigenschaften Partikelmath;
             for (int i = 0; i < kinematicLine; i++) {
@@ -130,25 +147,26 @@ class Particle {
 
     };
 public:
+    //Debug ausgabe
     void PrintValue() {
         cout << fixed;
         cout << "Ausgabe der" << Folder << FolderName<< Number << "\\lagrangian\\kinematicCloud daten" << endl;
             // Kinematik-Daten ausgeben
             for (int i = 0; i < kinematicLine; i++) {
                 for (int j = 0; j < 8; j++) {
-                    float tempdata = kinematicContent[i][j];
-                    cout << tempdata << endl;
+                    double tempdata = kinematicContent[i][j];
+                    cout << tempdata << "  ";
                 }
                 cout << endl;
             }
     }
-
+//erstellt openfoam datei
     void CreateFile(string getfolder,string FolderNumberStr,string fileName) {
-            // Build the full path
+            // Baut die datei wenn sie nicht existiert
 
             string dirPath = getfolder +"\\"+FolderName+"\\" + FolderNumberStr + R"(\lagrangian\kinematicCloud\)";
 
-            // Create all directories in the path if they don't exist
+            // Erstellt die ordner wenn sie nicht existieren
             ofstream File;
 
 
@@ -162,7 +180,7 @@ public:
                 cout << "Error opening file: " << dirPath + fileName << endl;
                 return;
             }
-
+//Open Foam header mit entsprechenden variablen
         File <<  R"(/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
@@ -184,6 +202,7 @@ FoamFile
 )"<<kinematicLine<<R"(
 (
 )";
+        //ausgabe der dateien im entsprechenden format
     for (int i = 0; i < kinematicLine; i++) {
         if (fileName == "positions"){
             File<<"("<< kinematicContent[i][4]<<" "<<kinematicContent[i][5]<<" "<<kinematicContent[i][6]<<") "<<kinematicContent[i][7]<<endl;
@@ -206,11 +225,11 @@ FoamFile
     File.close();
         cout << fileName << endl;
     }
-
+//erhöt den zeitschritt und berechnet die neuen werte
     void increaseTime( vector<array<double,3>> UCell) {
-        //Argumente ergänzen
         TimeSteps = TimeSteps + 1;
         Partikel_Eigenschaften Partikel1;
+        //partikeldaten und re neu berechnen
         for (int i = 0; i < kinematicLine; i++) {
             if (kinematicContent[i][4]==5&&Spray) {
                 RePartikel[i]=0;
@@ -222,7 +241,7 @@ FoamFile
 
 
         }
-
+        //hinzufügen der entsprechenden daten wenn Spray existiert
         if (Spray) {
 
             for (int i = 0; i < 50; i++) {
@@ -242,7 +261,6 @@ FoamFile
                 }
             }
 
-            //hier werdem die neuem dateipunkte hinnzugefügt werden#
             for (int i = 0; i < 4; i++) {
                 string temp;
                 if (i == 0) {
@@ -274,9 +292,11 @@ FoamFile
         }
         TimeHelper++;
     }
+    //gibt simulationszeitschritte zurücl
         int GiveTime() {
             return TimeSteps;
         }
+    //finale Re berechnung da man alle daten von schritt 2.8 braucht
     void ReFinal(vector<array<double,3>> UCell) {
         Partikel_Eigenschaften Partikel1;
         for (int i = 0; i < kinematicLine; i++) {
@@ -290,6 +310,7 @@ FoamFile
         }
         CreateFile(Folder,"2.8","Re");
     }
+    //gibt auswertungsdaten als txt zurück(optional aber hilfreich für aufgaben)
     void Auswertung(string getfolder) {
         array<double,26> Auswertung;
         for (int i = 0; i < kinematicLine; i++) {

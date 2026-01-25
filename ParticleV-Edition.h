@@ -149,7 +149,6 @@ class Particle {
 public:
     //Debug ausgabe
     void PrintValue() {
-        cout << fixed;
         cout << "Ausgabe der" << Folder << FolderName<< Number << "\\lagrangian\\kinematicCloud daten" << endl;
             // Kinematik-Daten ausgeben
             for (int i = 0; i < kinematicLine; i++) {
@@ -170,16 +169,17 @@ public:
             ofstream File;
 
 
-            File.open(dirPath + fileName);
+            File.open(dirPath + fileName,std::ios_base::binary | std::ios_base::out );
         if (!File.is_open()) {
             filesystem::create_directories(dirPath);
-            File.open(dirPath + fileName);
+            File.open(dirPath + fileName,std::ios_base::binary | std::ios_base::out );
         }
 
             if (!File.is_open()) {
                 cout << "Error opening file: " << dirPath + fileName << endl;
                 return;
             }
+
 //Open Foam header mit entsprechenden variablen
         File <<  R"(/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
@@ -208,13 +208,13 @@ FoamFile
             File<<"("<< kinematicContent[i][4]<<" "<<kinematicContent[i][5]<<" "<<kinematicContent[i][6]<<") "<<kinematicContent[i][7]<<endl;
         }
         else if (fileName == "d"){
-            File<<"("<< kinematicContent[i][3]<<")"<<endl;
+            File<< kinematicContent[i][3]<<endl;
         }
         else if (fileName == "U"){
             File<<"("<< kinematicContent[i][0]<<" "<<kinematicContent[i][1]<<" "<<kinematicContent[i][2]<<")"<<endl;
     }
         else if (fileName == "Re") {
-            File<< "("<<RePartikel[i]<<")"<<endl;
+            File<<RePartikel[i]<<endl;
         }
     }
         File<<R"()

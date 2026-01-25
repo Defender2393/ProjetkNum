@@ -8,9 +8,9 @@
 #include "GeleseneDatenC.h"
 #include "ParticleV-Edition.h"
 using namespace std;                                                                                                    //alle genutzen variablen werden hier deklariert
-bool DevMode=false;
 int LineNumber[4];
 int kinematicLine;
+bool DevMode=false;
 char Character = 'C';
 string FolderNumber;
 bool ErrorIsThere = false;
@@ -72,6 +72,7 @@ int main() {
             ParticleData.increaseTime(FieldData.Content());
             if (DevMode) {
                 FieldData.PrintValue();
+                ParticleData.PrintValue();
             }
         }
         FolderNumber=TimeHelp[140];

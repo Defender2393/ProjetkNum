@@ -35,7 +35,7 @@ double U_p, U_c;
 double temptransfer;
 int CELL_ID;
 int Raumrichtung;
-bool DevMode;
+bool Devmode;
 vector <array<double, 8>> temporaryContent; 
 array<double, 8> temporaryArray; //! 0,1,2 fuer Geschwindigkeiten / 3 fuer diameter / 4,5,6 fuer Positionen / 7 fuer Cell_ID 
 vector<double> timeContent;
@@ -43,7 +43,7 @@ vector<array<double, 3>> temporaryUValue;
 
 
 class Partikel_Eigenschaften{
-    Partikel_Eigenschaften() {
+public:    Partikel_Eigenschaften() {
 
 
             ifstream config(getfolder()+"\\Config.txt");              //öffnet config
@@ -51,7 +51,7 @@ class Partikel_Eigenschaften{
                 cout << "Error in opening config file" << endl;      //error wenn config nicht gefunen werden kann
             }
             config.ignore(100, '=');                            //geht bis zu 100 zeichen nach dem nächsten =
-            config >> DevMode;                                           //setzt die Variable DevMode
+            config >> Devmode;                                           //setzt die Variable DevMode
             config.ignore(100, '=');
             config.ignore(100, '=');
         config.ignore(100, '=');
@@ -68,14 +68,13 @@ class Partikel_Eigenschaften{
             config >> eta;
         }
 
-            if (DevMode) {
-                cout << DevMode << endl;                                //wenn devmode=1 ist gibt es 1 aus
+            if (Devmode) {
+                cout << Devmode << endl;                                //wenn devmode=1 ist gibt es 1 aus
             }
 
             config.close();
 
     }
-private:
     string getfolder() {
         filesystem::path Filepath = filesystem::current_path();   //Ordnerpath findet den ordnerpfad und setzt Ordnerpath als diesen
         string Ordnerstring = Filepath.string();                  //gibt Ordnerstring mit dem selben information wie ordnerpath als string an//gibt den string aus
@@ -153,7 +152,7 @@ array<double, 8> U_und_pos_von_Partikel(array<double, 8> data,double U_cx, doubl
         RE = Re_von_Partikel(U_px, U_py, U_cx, U_cy, diameter);
         U_px1 = U_px + ((((U_cx - U_px) / tau_von_Partikel(RE, rho_p, diameter, eta)) + (g * (1 - (rho_c / rho_p)))) * (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta)))));
         U_py1 = (U_py +   (((U_cy - U_py) / tau_von_Partikel(RE, rho_p, diameter, eta)))* (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta))))); //? Keine Beschleunigung in y-Richtung
-if(DevMode){     
+if(Devmode){
         cout << "----------------------------------------------------------------------------------" << endl;                                                                                                                                                                     
         cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px0 << endl; 
         cout << "U_py zum Zeitpunkt " << Zeitpunkt <<": " << U_py1 << endl;
@@ -168,7 +167,7 @@ if(DevMode){
                
         pos_x1 = pos_x + U_px * dT; //? Berechnung der Position in x
         pos_y1 = pos_y + U_py * dT; //? Berechnung der Position in y
-if(DevMode){
+if(Devmode){
         cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x1 << endl; 
         cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y1 << endl;
         cout << "pos_z zum Zeitpunkt " << Zeitpunkt <<": " << pos_z  << endl;
@@ -214,7 +213,7 @@ if(DevMode){
 
         temporaryArray[0] = 0.0; //? Geschwindigkeit bei dem Erreichen der Auswertungsebene wird null
         temporaryArray[1] = 0.0;
-if(DevMode){
+if(Devmode){
         cout << "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: " << U_px1 <<" zum Zeitpunkt " << Zeitpunkt << endl;
         cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: " << Cell_ID(pos_x1, pos_y1) << endl;       
 }    
@@ -225,7 +224,7 @@ if(DevMode){
         temporaryArray[5] = pos_y1;
         temporaryArray[0] = 0.0; 
         temporaryArray[1] = 0.0;
-if(DevMode){
+if(Devmode){
         cout<< "Partikel klebt an der Decke" << endl;
 }
         temporaryArray[7] = Cell_ID(pos_x1 + 0.1, pos_y1);
@@ -236,7 +235,7 @@ if(DevMode){
         temporaryArray[5] = pos_y1;
         temporaryArray[0] = 0.0;
        temporaryArray[1] = 0.0;
-if(DevMode){
+if(Devmode){
         cout << "Raum wird in negativer y-Richtung verlassen" << endl;
 }
         temporaryArray[7] = Cell_ID(pos_x1, pos_y1 + 0.1);
@@ -247,7 +246,7 @@ if(DevMode){
         temporaryArray[5] = pos_y1;
         temporaryArray[0] = 0.0;
         temporaryArray[1] = 0.0;
-if(DevMode){
+if(Devmode){
         cout << "Raum in positiver y-Richtung wird verlassen" << endl;
 }
         temporaryArray[7] = Cell_ID(pos_x1, pos_y1 - 0.1);
@@ -255,7 +254,7 @@ if(DevMode){
     else{        
         temporaryArray[7] = Cell_ID(pos_x1, pos_y1);
     }
-if(DevMode){
+if(Devmode){
         cout << "Host_ID: " << Cell_ID(pos_x1, pos_y1) << " zum Zeitpunkt " << Zeitpunkt <<  endl;
         cout << "----------------------------------------------------------------------------------" << endl;
 }

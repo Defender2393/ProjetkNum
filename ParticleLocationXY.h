@@ -22,12 +22,12 @@ double  pos_x0, pos_x1, pos_y0, pos_y1;
 //!-------------------------------------
 
 //const double diameter; //! in MS3 nicht mehr konstant, kann aber zur Kontrolle 0.02 vorerst bleiben
-const double g = 9.81;
-const double rho_c = 1.199;
-const double rho_p = 998.207;
+double g = 9.81;
+double rho_c = 1.199;
+double rho_p = 998.207;
 const double zweidurchdrei = 2.0/3.0;
-const double eta = 1.824878*1e-5;
-const double dT = 0.02;
+double eta = 1.824878*1e-5;
+const double dT=0.02;
 double tau;
 double Reynolds, RE;
 double Widerstand;
@@ -43,7 +43,44 @@ vector<array<double, 3>> temporaryUValue;
 
 
 class Partikel_Eigenschaften{
+    Partikel_Eigenschaften() {
 
+
+            ifstream config(getfolder()+"\\Config.txt");              //öffnet config
+            if (!config.is_open()) {
+                cout << "Error in opening config file" << endl;      //error wenn config nicht gefunen werden kann
+            }
+            config.ignore(100, '=');                            //geht bis zu 100 zeichen nach dem nächsten =
+            config >> DevMode;                                           //setzt die Variable DevMode
+            config.ignore(100, '=');
+            config.ignore(100, '=');
+        config.ignore(100, '=');
+        int Overwrite;
+        config >> Overwrite;
+        if (Overwrite) {
+            config.ignore(100, '=');
+            config >> g;
+            config.ignore(100, '=');
+            config >> rho_c;
+            config.ignore(100, '=');
+            config >> rho_p;
+            config.ignore(100, '=');
+            config >> eta;
+        }
+
+            if (DevMode) {
+                cout << DevMode << endl;                                //wenn devmode=1 ist gibt es 1 aus
+            }
+
+            config.close();
+
+    }
+private:
+    string getfolder() {
+        filesystem::path Filepath = filesystem::current_path();   //Ordnerpath findet den ordnerpfad und setzt Ordnerpath als diesen
+        string Ordnerstring = Filepath.string();                  //gibt Ordnerstring mit dem selben information wie ordnerpath als string an//gibt den string aus
+        return Ordnerstring;                                        //gibt als die Funktionswerk Ordnerstring aus
+    }
 public:
 
 double Betrag_von_U_von_Partikel(double U_px, double U_py){

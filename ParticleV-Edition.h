@@ -193,7 +193,21 @@ FoamFile
     version     2.0;
     format      ascii;
     arch        "LSB;label=32;scalar=64";
-    class       vectorField;
+    class       )";
+        if (fileName == "positions"){
+            File<<"Cloud<basicKinematicParcel>;";
+        }
+        else if (fileName == "d"){
+            File<<"scalarField;";
+        }
+        else if (fileName == "U"){
+            File<<"vectorField;";
+        }
+        else if (fileName == "Re") {
+            File<<"scalarField;";
+        }
+
+    File<< R"(
     location    ")"<<FolderNumberStr<<R"(/lagrangian/kinematicCloud";
     object      )"<<fileName<<R"(;
 }

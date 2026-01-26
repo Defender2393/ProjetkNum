@@ -66,7 +66,6 @@ public:    Partikel_Eigenschaften() {
             config >> rho_p;
             config.ignore(100, '=');
             config >> eta;
-            eta=eta*1e-5;
         }
 
             if (Devmode) {
@@ -182,35 +181,13 @@ if(Devmode){
 //!============================================================================================================================Berechnung der Host-ID beginnt hier
         
     if(pos_x1 >= 5.0){
-               
-    if(U_py1 > 0){
-        double alpha = atan(U_px1/U_py1);
-        double pos_x1_cut = pos_x1 - 5;
-        double beta = 90 - alpha;
-        double U_p_cut = pos_x1_cut / cos(beta);
-        double pos_y1_cut;
-        pos_y1_cut = sqrt(pow(U_p_cut, 2) - pow(pos_x1_cut,2));
-        double pos_y1_real = pos_y1 - pos_y1_cut;
-        temporaryArray[4] = 5;
-        temporaryArray[5] = pos_y1_real;
-        temporaryArray[7] = Cell_ID(pos_x1 - 0.1, pos_y1_real);
-        
-    }else if (U_py1 < 0){
-        double alpha = atan(U_px1/U_py1);
-        double pos_x1_cut = pos_x1 - 5;
-        double beta = 90 - alpha;
-        double U_p_cut = pos_x1_cut / cos(beta);
-        double pos_y1_cut;
-        pos_y1_cut = sqrt(pow(U_p_cut, 2) - pow(pos_x1_cut,2));
-        double pos_y1_real = pos_y1 + pos_y1_cut; // Da in "andere" Richtung ueberschritten
-        temporaryArray[4] = 5;
-        temporaryArray[5] = pos_y1_real;
-        temporaryArray[7] = Cell_ID(pos_x1 - 0.1, pos_y1_real);
-    }else if (U_py1 == 0){  //Derselbe Fall wie in Meilenstein 2
-
-        temporaryArray[4] = 5;
-
-        }
+        double pos_temp=pos_x1-5.0;
+        double multiplier=pos_temp/U_px;
+        pos_y1=pos_y1-multiplier*U_py;
+        pos_x1=5.0;
+        temporaryArray[4] =pos_x1;
+        temporaryArray[5] = pos_y1;
+        temporaryArray[7] = Cell_ID(pos_x1 - 0.1, pos_y1);
 
         temporaryArray[0] = 0.0; //? Geschwindigkeit bei dem Erreichen der Auswertungsebene wird null
         temporaryArray[1] = 0.0;

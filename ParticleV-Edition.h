@@ -141,8 +141,9 @@ class Particle {
             for (int i = 0; i < kinematicLine; i++) {
                 RePartikel[i] = Partikelmath.Re_von_Partikel(kinematicContent[i][0],kinematicContent[i][1],UCell[kinematicContent[i][7]][0],UCell[kinematicContent[i][7]][1],kinematicContent[i][3]);
             }
-            CreateFile(Folder,namesofFilesSpray[0],"Re");
-
+            if (RePrint) {
+                CreateFile(Folder,namesofFilesSpray[0],"Re");
+            }
         }
 
     };
@@ -299,9 +300,7 @@ FoamFile
                         CreateFile(Folder,namesofFilesSpray[TimeHelper],temp);
                     }
                 }
-                else {
-                    CreateFile(Folder,namesofFilesTrofpen[TimeSteps-1],temp);
-                }
+                
             }
         }
         TimeHelper++;
@@ -322,7 +321,10 @@ FoamFile
             }
 
         }
-        CreateFile(Folder,"2.8","Re");
+
+        if (RePrint) {
+            CreateFile(Folder,"2.8","Re");
+        }
     }
     //gibt auswertungsdaten als txt zurück(optional aber hilfreich für aufgaben)
     void Auswertung(string getfolder) {

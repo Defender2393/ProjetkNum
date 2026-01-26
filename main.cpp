@@ -71,7 +71,6 @@ int main() {
 
             ParticleData.increaseTime(FieldData.Content());
             if (DevMode) {
-                FieldData.PrintValue();
                 ParticleData.PrintValue();
             }
         }

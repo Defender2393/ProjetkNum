@@ -81,12 +81,16 @@ int main() {
 
     }
     if (IsTropfenOrSpray==1) {
-        for (int i=0; i<22; i++) {
-          //  ParticleData.increaseTime(FieldData.Content());
+        GeleseneDatenC FieldData(getfolder(), FolderNumber, DevMode,IsTropfenOrSpray);
 
-          //  Ptime=ParticleData.GiveTime();
-            //GeleseneDatenC FieldData(getfolder(), FolderNumber, DevMode);
+        Particle ParticleData(getfolder(), FolderNumber, DevMode, IsTropfenOrSpray,FieldData.Content(),PrintRe);
+
+        for (int i=0; i<22; i++) {
+          ParticleData.increaseTime(FieldData.Content());
+
         }
+        ParticleData.ReFinal(FieldData.Content());
+
     }
     // Fehlerbehandlung: Wenn ein Fehler aufgetreten ist
     // Rückgabewert des Programms

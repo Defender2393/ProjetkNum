@@ -46,6 +46,8 @@ public:
        cout << "Error in opening file, have you checked if the Ordner you want opened has the intended Name" << endl;
         ErrorIsThere = true;
     }
+            //liest die Dateiinhalte aus indem zu entsprechender Stelle gesprungen wird, werte gelesen, wiederholt.
+            //hat Fallunterscheidung für die Verschiedenen Ordner.
         File.ignore(1000,'>');
         File >> LineNumber[z];
             File.ignore(4,'(');
@@ -83,6 +85,7 @@ public:
                 ErrorIsThere = true;
 
             }
+        //liest dateien im selben Vormat aus wie in der Initialisierung aber nur die U Ordner dateien da C gleich bleibt.
             File.ignore(1000,'>');
             File >> LineNumber[1];
             File.ignore(4,'(');
@@ -98,6 +101,8 @@ public:
         return UContent;
     }
     void PrintValue() {
+        //wurde genutzt um die U daten über die Konsole auszugeben
+        //hat sich
 
         cout << "Ausgabe der daten aus " << Folder << +"\\"+FolderName+"\\" << Number << "\\U" << endl;
 

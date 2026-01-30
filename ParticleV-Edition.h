@@ -238,7 +238,9 @@ FoamFile
 // ************************************************************************* //
         )";
     File.close();
-        cout << fileName << endl;
+        if (Devmode) {
+            cout << fileName << endl;
+        }
     }
 //erhöt den zeitschritt und berechnet die neuen werte
     void increaseTime( vector<array<double,3>> UCell) {
@@ -246,19 +248,27 @@ FoamFile
         Partikel_Eigenschaften Partikel1;
         //partikeldaten und re neu berechnen
         for (int i = 0; i < kinematicLine; i++) {
-            if (kinematicContent[i][4]==5&&Spray) {
-                RePartikel[i]=0;
+            //Fallunterscheidung zwischen Spray und Tropfen um unterschiedleiche Funktionen zu rufen
+            if (Spray){
+                if (kinematicContent[i][4]==5&&Spray) {
+                    RePartikel[i]=0;
+                }
+                else {
+                    RePartikel[i] = Partikel1.Re_von_Partikel(kinematicContent[i][0],kinematicContent[i][1],UCell[kinematicContent[i][7]][0],UCell[kinematicContent[i][7]][1],kinematicContent[i][3]);
+                }
+                kinematicContent[i]= Partikel1.U_und_pos_von_Partikel(kinematicContent[i],UCell[kinematicContent[i][7]][0],UCell[kinematicContent[i][7]][1],TimeSteps);
+
+
             }
+
             else {
-                RePartikel[i] = Partikel1.Re_von_Partikel(kinematicContent[i][0],kinematicContent[i][1],UCell[kinematicContent[i][7]][0],UCell[kinematicContent[i][7]][1],kinematicContent[i][3]);
+            RePartikel[i] = Partikel1.Re_von_Partikel(kinematicContent[i][0],kinematicContent[i][1],0,0,kinematicContent[i][3]);
+                kinematicContent[i]= Partikel1.U_und_pos_von_Tropfen(kinematicContent[i],TimeSteps);
+
             }
-            kinematicContent[i]= Partikel1.U_und_pos_von_Partikel(kinematicContent[i],UCell[kinematicContent[i][7]][0],UCell[kinematicContent[i][7]][1],TimeSteps);
-
-
         }
         //hinzufügen der entsprechenden daten wenn Spray existiert
         if (Spray) {
-
             for (int i = 0; i < 50; i++) {
                 if ((TimeSteps*0.02)==particletxt[i][0]) {
                     RePartikel.push_back(0);
@@ -271,10 +281,11 @@ FoamFile
                     kinematicContent[kinematicLine][5]=particletxt[i][2];
                     kinematicContent[kinematicLine][6]=particletxt[i][3];
                     kinematicContent[kinematicLine][7]=Partikel1.Cell_ID(kinematicContent[kinematicLine][4],kinematicContent[kinematicLine][5]);
-                                        kinematicLine++;
+                    kinematicLine++;
 
                 }
             }
+        }
 
             for (int i = 0; i < 4; i++) {
                 string temp;
@@ -300,7 +311,15 @@ FoamFile
                         CreateFile(Folder,namesofFilesSpray[TimeHelper],temp);
                     }
                 }
-                
+                else {
+                    if (temp=="Re"&&RePrint) {
+                        CreateFile(Folder,namesofFilesTrofpen[TimeHelper-1],temp);
+
+                    }
+                    else if (temp!="Re") {
+                        CreateFile(Folder,namesofFilesTrofpen[TimeHelper],temp);
+                }
+
             }
         }
         TimeHelper++;
@@ -313,17 +332,25 @@ FoamFile
     void ReFinal(vector<array<double,3>> UCell) {
         Partikel_Eigenschaften Partikel1;
         for (int i = 0; i < kinematicLine; i++) {
+            //Fallunterscheidung abhängig von den Werten
             if (kinematicContent[i][4]==5&&Spray) {
                 RePartikel[i]=0;
             }
-            else {
+            else if (Spray) {
                 RePartikel[i] = Partikel1.Re_von_Partikel(kinematicContent[i][0],kinematicContent[i][1],UCell[kinematicContent[i][7]][0],UCell[kinematicContent[i][7]][1],kinematicContent[i][3]);
             }
+            else if (kinematicContent[i][4]==72&&!Spray) {
+                RePartikel[i]=0;
+            }
+
 
         }
-
-        if (RePrint) {
+        //Printed nur Wenn Spray=Wahr unterschiedliche Parameter für die Unterschiedlichen Funktionen
+        if (RePrint&&Spray) {
             CreateFile(Folder,"2.8","Re");
+        }
+        else if (RePrint) {
+            CreateFile(Folder,"11","Re");
         }
     }
     //gibt auswertungsdaten als txt zurück(optional aber hilfreich für aufgaben)
@@ -331,9 +358,11 @@ FoamFile
         array<double,26> Auswertung;
         for (int i = 0; i < kinematicLine; i++) {
             if (kinematicContent[i][4]==5) {
-                Auswertung[kinematicContent[i][5]/0.5]=Auswertung[kinematicContent[i][5]/0.5]+(pow((kinematicContent[i][3]/2),3)*numbers::pi*(4/3));
+                //Berechnet das Volumen der entsprechenden Teile
+                Auswertung[kinematicContent[i][5]*2]=Auswertung[kinematicContent[i][5]/0.5]+(pow((kinematicContent[i][3]/2),3)*numbers::pi*(4/3));
             }
         }
+        //schreibt die Daten als txt Ordner
         ofstream File;
         File.open(getfolder+"\\Spray"+"\\Auswertung.txt");
         if (!File.is_open()) {

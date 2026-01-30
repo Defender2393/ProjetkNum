@@ -27,7 +27,7 @@ double rho_c = 1.199;
 double rho_p = 998.207;
 const double zweidurchdrei = 2.0/3.0;
 double eta = 1.824878*1e-5;
-const double dT=0.02;
+double dT=0.02;
 double tau;
 double Reynolds, RE;
 double Widerstand;
@@ -117,7 +117,19 @@ double tau_von_Partikel(double RE, double rho_p, double diameter, double eta) { 
             return tau;
 
 }
+    int Cell_ID_Tropfen(double pos_x1, double pos_y1){
 
+    const double C_dist_x = 12;   //? Kantenlaenge der Zelle in x-Richtung
+    const double C_dist_y = 20;   //? Kantenlaenge der Zelle in y-Richtung
+    const int AnzC_x = 6;           //? Anzahl der Zellen in x-Richtung
+    //? const int AnzC_y = 65;           //? Anzahl der Zellen in y-Richtung
+
+    int Hilfe_x = (pos_x1 / C_dist_x);
+    int Hilfe_y = (pos_y1 / C_dist_y);
+    CELL_ID = Hilfe_y * AnzC_x + Hilfe_x;
+
+    return CELL_ID;
+}
 
 int Cell_ID(double pos_x1, double pos_y1){
 
@@ -242,7 +254,83 @@ if(Devmode){
     
     //? Uebergabe der Partikeldaten
             return temporaryArray;
-    } 
+    }
+    array<double, 8> U_und_pos_von_Tropfen(array<double, 8> data,int Timesteps){
+    if (data[4]==72){
+        temporaryArray=data;
+        return temporaryArray;
+
+    }
+    //setzen der physikalischen Variablen entweder aus dem Array oder als konstante Werte
+        dT=0.5;
+        double Zeitpunkt = 0.5*Timesteps;
+        double diameter= data[3];
+        double U_px=data[0];
+        double U_py=data[1];
+         double   pos_x=data[4];
+        double pos_y=data[5];
+        double U_pz=data[2];
+        double pos_z=data[6];
+        double U_cx=0;
+        double U_cy=0;
+        RE = Re_von_Partikel(U_px, U_py, U_cx, U_cy, diameter);
+        U_px1 = U_px + ((((U_cx - U_px) / tau_von_Partikel(RE, rho_p, diameter, eta)) + (g * (1 - (rho_c / rho_p)))) * (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta)))));
+if(Devmode){
+        cout << "----------------------------------------------------------------------------------" << endl;
+        cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px << endl;
+        cout << "U_py zum Zeitpunkt " << Zeitpunkt <<": " << U_py << endl;
+        cout << "U_pz zum Zeitpunkt " << Zeitpunkt <<": " << U_pz << endl;
+        cout << "----------------------------------------------------------------------------------" <<endl;
+}
+        temporaryArray[0] = U_px1;
+        temporaryArray[1] = U_py1;
+        temporaryArray[2] = U_pz;
+
+//!============================================================================================================================Berechnung der Position beginnt hier
+
+        pos_x1 = pos_x + U_px * dT; //? Berechnung der Position in x
+        pos_y1 = pos_y + U_py * dT; //? Berechnung der Position in y
+if(Devmode){
+        cout << "pos_x zum Zeitpunkt " << Zeitpunkt <<": " << pos_x1 << endl;
+        cout << "pos_y zum Zeitpunkt " << Zeitpunkt <<": " << pos_y1 << endl;
+        cout << "pos_z zum Zeitpunkt " << Zeitpunkt <<": " << pos_z  << endl;
+        cout << "----------------------------------------------------------------------------------" << endl;
+}
+        temporaryArray[3] = diameter;
+        temporaryArray[4] = pos_x1;
+        temporaryArray[5] = pos_y1;
+        temporaryArray[6] = pos_z;
+
+//!============================================================================================================================Berechnung der Host-ID beginnt hier
+//Sonderfall für die Auswertungsebene
+    if(pos_x1 >= 72){
+        pos_x1 = 72;
+        temporaryArray[4] = pos_x1;
+        temporaryArray[7] = Cell_ID_Tropfen(pos_x1-0.1, pos_y1);
+
+        temporaryArray[0] = 0.0; //? Geschwindigkeit bei dem Erreichen der Auswertungsebene wird null
+        temporaryArray[1] = 0.0;
+if(Devmode){
+        cout << "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: " << U_px1 <<" zum Zeitpunkt " << Zeitpunkt << endl;
+        cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: " << Cell_ID_Tropfen(pos_x1, pos_y1) << endl;
+}
+
+    }
+    else {
+        temporaryArray[7] = Cell_ID_Tropfen(pos_x1, pos_y1);
+
+        if(Devmode){
+            cout << "Host_ID: " << Cell_ID_Tropfen(pos_x1, pos_y1) << " zum Zeitpunkt " << Zeitpunkt <<  endl;
+            cout << "----------------------------------------------------------------------------------" << endl;
+        }
+    }
+        Zeitpunkt += dT;
+        temporaryContent.push_back(temporaryArray);
+        timeContent.push_back(Zeitpunkt);
+
+    //? Uebergabe der Partikeldaten
+            return temporaryArray;
+    }
 
     //? Uebergabe der Zeitschritte
     vector<double> GiveTime(vector<double> timeContent){

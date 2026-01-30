@@ -6,42 +6,43 @@ using namespace std;
 
 
 //-------------------------------------
-double U_cx = 0.0;
-double U_cy = 0.0;  //Geschwindigkeiten der Zelle
-double U_cz = 0.0;
-//-------------------------------------
-double U_px, U_px0, U_px1; 
-double U_py = 0.0;  //Geschwindigkeiten vom Partikel
-double U_pz = 0.0;
-//-------------------------------------
-double pos_x, pos_x0, pos_x1;
-double pos_y = 30.0;    //Positionen vom Partikel
-double pos_z =  5.0;
-//-------------------------------------
-const double U_max = 7.06423;
-const double diameter = 0.002;
-const double g = 9.81;
-const double rho_c = 1.199;
-const double rho_p = 998.207;
-const double zweidurchdrei = 2.0/3.0;
-const double eta = 1.824878*1e-5;
-const double dT = 0.5;
-const double Zeitpunktmax = 11.0;
-double tau;
-double Reynolds, RE;
-double Widerstand;
-int Cell_ID;
-double U_p;
-vector <array<double, 8>> temporaryContent;
-array<double, 8> temporaryArray;
-vector <double> timeContent;
-double temptransfer;
 
-class Partikel_Eigenschaften{
+class Tropfen_Eigenschaften{
 
 public:
 
 double Re_von_Partikel(double U_px, double U_cx, double diameter){
+    double U_cx = 0.0;
+    double U_cy = 0.0;  //Geschwindigkeiten der Zelle
+    double U_cz = 0.0;
+    //-------------------------------------
+    double U_px0, U_px1;
+
+    //-------------------------------------
+    double  pos_x0, pos_x1;
+    //Positionen vom Partikel
+
+    //-------------------------------------
+    const double U_max = 7.06423;
+    double diameter = 0.002;
+    const double g = 9.81;
+    const double rho_c = 1.199;
+    const double rho_p = 998.207;
+    const double zweidurchdrei = 2.0/3.0;
+    const double eta = 1.824878*1e-5;
+    const double dT = 0.5;
+    const double Zeitpunktmax = 11.0;
+    double tau;
+    double Reynolds, RE;
+    double Widerstand;
+    int Cell_ID;
+    double U_p;
+    vector <array<double, 8>> temporaryContent;
+    array<double, 8> temporaryArray;
+    vector <double> timeContent;
+    double temptransfer;
+
+
     Reynolds = (rho_c * abs(U_px - U_cx) * diameter) / eta;
         return Reynolds;
 }

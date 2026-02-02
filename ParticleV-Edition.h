@@ -58,7 +58,7 @@ class Particle {
         }
 //U-Datei öffnen und lesen, auslesen der Partikelzahl
         File.open(getfolder+"\\"+FolderName+"\\"+FolderNumberstr+R"(\lagrangian\kinematicCloud\U)");       //öffnet die lagranian dateien und extrahier hier
-         File.imbue(locale::classic());                                                                                 //locale::classic setzt die spracheinstellungen auf classic dass floats gelesen werden können
+         File.imbue(locale::classic());                                                                                 //locale::classic setzt die spracheinstellungen auf classic dass doubles gelesen werden können
          string line;
           while (getline(File, line))                                                                                    //solange noch zeilen in datei liest diese
     {

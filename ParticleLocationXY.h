@@ -66,6 +66,7 @@ public:    Partikel_Eigenschaften() {
             config >> rho_p;
             config.ignore(100, '=');
             config >> eta;
+            eta=eta*1e-5;
         }
 
             if (Devmode) {

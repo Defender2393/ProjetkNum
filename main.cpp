@@ -14,8 +14,6 @@ bool DevMode=false;
 char Character = 'C';
 string FolderNumber;
 bool ErrorIsThere = false;
-float PhysVar1;
-float PhysVar2;
 int IsTropfenOrSpray;
 bool MinorErrorIsThere = false;
 int Ptime;

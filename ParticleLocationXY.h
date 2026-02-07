@@ -21,7 +21,7 @@ double  pos_x0, pos_x1, pos_y0, pos_y1;
 
 //!-------------------------------------
 
-//const double diameter; //! in MS3 nicht mehr konstant, kann aber zur Kontrolle 0.02 vorerst bleiben
+// Diese Variablen werden im Konstruktor optional aus Config.txt überschriebe
 double g = 9.81;
 double rho_c = 1.199;
 double rho_p = 998.207;
@@ -41,8 +41,17 @@ array<double, 8> temporaryArray; //! 0,1,2 fuer Geschwindigkeiten / 3 fuer diame
 vector<double> timeContent;
 vector<array<double, 3>> temporaryUValue;
 
-
+// Klasse Partikel_Eigenschaften
+// Enthält alle physikalischen Modelle für Partikel:
+    // Reynolds-Zahl
+    // Relaxationszeit (tau)
+    // Bewegungsgleichungen
+    //Zellzuordnung (Host-ID)
+// Unterstützt Spray- und Tropfenfälle getrennt
 class Partikel_Eigenschaften{
+    // Konstruktor:
+        // Liest physikalische Parameter aus Config.txt
+        // Ermöglicht das Überschreiben von Standardwerten (Overwrite-Flag)
 public:    Partikel_Eigenschaften() {
 
 
@@ -55,6 +64,7 @@ public:    Partikel_Eigenschaften() {
             config.ignore(100, '=');
             config.ignore(100, '=');
         config.ignore(100, '=');
+    // Overwrite = 1 erlaubt das manuelle Setzen physikalischer Konstanten
         int Overwrite;
         config >> Overwrite;
         if (Overwrite) {
@@ -93,7 +103,7 @@ double Betrag_von_U_von_Zelle(double U_cx, double U_cy){
             return U_c;
 }
 
-//? ReynoldsZahl
+    // Berechnet die Reynolds-Zahl des Partikels basierend auf Relativgeschwindigkeit zwischen Partikel und Gas
 double Re_von_Partikel(double U_px, double U_py, double U_cx, double U_cy, double diameter){
     U_px=U_px - U_cx;
     U_py=U_py - U_cy;
@@ -101,7 +111,11 @@ double Re_von_Partikel(double U_px, double U_py, double U_cx, double U_cy, doubl
             return Reynolds;
 }
 
-//? Tau
+    // Berechnet die Relaxationszeit tau des Partikels
+    // Unterschiedliche Widerstandsmodelle je nach Reynolds-Zahl:
+        // RE = 0        : Stokes-Bereich
+        // RE <= 1000   : Übergangsbereich
+        // RE > 1000    : Newton-Bereich
 double tau_von_Partikel(double RE, double rho_p, double diameter, double eta) { //? Relaxationszahl, aber der Kehrwert berechnet aus der Formelsammlung, außerdem wurde gleichung 8 in 11 eingesetzt, sodass sich Re rauskürzt
     
     if (RE == 0){
@@ -118,6 +132,9 @@ double tau_von_Partikel(double RE, double rho_p, double diameter, double eta) { 
             return tau;
 
 }
+    // Bestimmt die Host-Zelle des Partikels
+    // Unterschiedliche Zellgeometrie für Spray und Tropfen:
+    // größere Zellen beim Tropfen
     int Cell_ID_Tropfen(double pos_x1, double pos_y1){
 
     const double C_dist_x = 12;   //? Kantenlaenge der Zelle in x-Richtung
@@ -131,7 +148,7 @@ double tau_von_Partikel(double RE, double rho_p, double diameter, double eta) { 
 
     return CELL_ID;
 }
-
+// kleinere Zellen beim Spray
 int Cell_ID(double pos_x1, double pos_y1){
 
         const double C_dist_x = 0.2;   //? Kantenlaenge der Zelle in x-Richtung
@@ -146,8 +163,9 @@ int Cell_ID(double pos_x1, double pos_y1){
     return CELL_ID;
 }
 
-//? Geschwindigkeiten und Positionen
-array<double, 8> U_und_pos_von_Partikel(array<double, 8> data,double U_cx, double U_cy, int Timesteps){
+    // Berechnet Geschwindigkeit und Position eines Spray Partikels für einen Zeitschritt mittels explizitem Integrationsschema
+    array<double, 8> U_und_pos_von_Partikel(array<double, 8> data,double U_cx, double U_cy, int Timesteps){
+    // Sonderfall für Partikel die Auswertungsebene erreicht haben
     if (data[4]==5){
         temporaryArray=data;
         return temporaryArray;
@@ -163,12 +181,13 @@ array<double, 8> U_und_pos_von_Partikel(array<double, 8> data,double U_cx, doubl
         double U_pz=data[2];
         double pos_z=data[6];
         RE = Re_von_Partikel(U_px, U_py, U_cx, U_cy, diameter);
+    //Bewegungsgleichungen mit Wiederstand, der Geschwingkeit und der Geschwindigkeit der Zellen
         U_px1 = U_px + ((((U_cx - U_px) / tau_von_Partikel(RE, rho_p, diameter, eta)) + (g * (1 - (rho_c / rho_p)))) * (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta)))));
         U_py1 = (U_py +   (((U_cy - U_py) / tau_von_Partikel(RE, rho_p, diameter, eta)))* (dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta))))); //? Keine Beschleunigung in y-Richtung
 if(Devmode){
         cout << "----------------------------------------------------------------------------------" << endl;                                                                                                                                                                     
-        cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px0 << endl; 
-        cout << "U_py zum Zeitpunkt " << Zeitpunkt <<": " << U_py1 << endl;
+        cout << "U_px zum Zeitpunkt " << Zeitpunkt <<": " << U_px << endl;
+        cout << "U_py zum Zeitpunkt " << Zeitpunkt <<": " << U_py << endl;
         cout << "U_pz zum Zeitpunkt " << Zeitpunkt <<": " << U_pz << endl;
         cout << "----------------------------------------------------------------------------------" <<endl;      
 }
@@ -192,7 +211,8 @@ if(Devmode){
         temporaryArray[6] = pos_z;
 
 //!============================================================================================================================Berechnung der Host-ID beginnt hier
-        
+    // Randbedingung: Auswertungsebene bei x = 5 m
+    //Partikel wird gestoppt und genaue Position berechnet
     if(pos_x1 >= 5.0){
         double pos_temp=pos_x1-5.0;
         double multiplier=pos_temp/U_px;
@@ -207,7 +227,11 @@ if(Devmode){
 if(Devmode){
         cout << "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: " << U_px1 <<" zum Zeitpunkt " << Zeitpunkt << endl;
         cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: " << Cell_ID(pos_x1, pos_y1) << endl;       
-}    
+}
+        // WeitereRandbedingungen:
+            // x <= 0   : Decke
+            // y <= 0   : untere Wand
+            // y >= 13  : obere Wand
     }
     else if(pos_x1 <= 0.0){
         pos_x1 = 0.0;
@@ -253,9 +277,12 @@ if(Devmode){
         temporaryContent.push_back(temporaryArray);
         timeContent.push_back(Zeitpunkt);    
     
-    //? Uebergabe der Partikeldaten
+    // Uebergabe der Partikeldaten
             return temporaryArray;
     }
+    // Bewegungsgleichung für fallenden Tropfen
+        // größeres Zeitintervall (dT = 0.5 s)
+        // kein Strömungsfeld (U_c = 0)
     array<double, 8> U_und_pos_von_Tropfen(array<double, 8> data,int Timesteps){
     if (data[4]==72){
         temporaryArray=data;
@@ -333,7 +360,7 @@ if(Devmode){
             return temporaryArray;
     }
 
-    //? Uebergabe der Zeitschritte
+    //? Uebergabe der Zeitschritte ist inzwischen Veraltet.
     vector<double> GiveTime(vector<double> timeContent){
         for(int i = 0 ; i < timeContent.size() ; i++){
             return timeContent;        

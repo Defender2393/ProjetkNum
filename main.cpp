@@ -28,7 +28,7 @@ string getfolder() {
 
 void getConfig() {
     //Liest Konfigurationswerte aus Config.txt aus
-    ifstream config(getfolder() + "\\Config.txt");
+    ifstream config(getfolder() + R"(\Config.txt)");
     if (!config.is_open()) {
         cout << "Error in opening config file" << endl; //error wenn config nicht gefunden werden kann
         ErrorIsThere = true; // Programm läuft trotzdem weiter

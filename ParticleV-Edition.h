@@ -84,7 +84,7 @@ public:
         }
         //U-Datei öffnen und lesen, auslesen der Partikelzahl
         // Ermittelt die Anzahl der Partikel aus der Kopfzeile der U-Datei
-        File.open(getfolder + "\\" + FolderName + "\\" + FolderNumberstr + R"(\lagrangian\kinematicCloud\U)");
+        File.open(getfolder + R"(\)" + FolderName + R"(\)" + FolderNumberstr + R"(\lagrangian\kinematicCloud\U)");
         //öffnet die lagranian dateien und extrahier hier
         File.imbue(locale::classic());
         //locale::classic setzt die spracheinstellungen auf classic dass doubles gelesen werden können
@@ -120,7 +120,7 @@ public:
         }
         File.close();
         //d-Datei lesen
-        File.open(getfolder + "\\" + FolderName + "\\" + FolderNumberstr + R"(\lagrangian\kinematicCloud\d)");
+        File.open(getfolder + R"(\)" + FolderName + R"(\)" + FolderNumberstr + R"(\lagrangian\kinematicCloud\d)");
         //öffnet das d file
         File.imbue(std::locale::classic());
         if (!File.is_open()) {
@@ -146,7 +146,7 @@ public:
         File.close();
 
         //liest positions auf dem ueblichen weg aus
-        File.open(getfolder + "\\" + FolderName + "\\" + FolderNumberstr + R"(\lagrangian\kinematicCloud\positions)");
+        File.open(getfolder + R"(\)" + FolderName + R"(\)" + FolderNumberstr + R"(\lagrangian\kinematicCloud\positions)");
         File.imbue(std::locale::classic());
         File.ignore(numeric_limits<streamsize>::max(), '('); //typische operation um auszulesen
         for (int i = 0; i < kinematicLine; i++) {
@@ -161,7 +161,7 @@ public:
         // Zeit, Position, Geschwindigkeit und Durchmesser
         if (SprayorTropfen == 2) {
             Spray = true;
-            File.open(getfolder + "\\Spray\\particles.txt");
+            File.open(getfolder + R"(\Spray\particles.txt)");
             File.ignore(numeric_limits<streamsize>::max(), 'd');
             File.imbue(std::locale::classic());
             if (!File.is_open()) {
@@ -192,7 +192,7 @@ public:
 public:
     //Debug ausgabe
     void PrintValue() {
-        cout << "Ausgabe der" << Folder << FolderName << Number << "\\lagrangian\\kinematicCloud daten" << endl;
+        cout << "Ausgabe der" << Folder << FolderName << Number << R"(\lagrangian\kinematicCloud daten)" << endl;
         // Kinematik-Daten ausgeben
         for (int i = 0; i < kinematicLine; i++) {
             for (int j = 0; j < 8; j++) {
@@ -207,7 +207,7 @@ public:
     void CreateFile(string getfolder, string FolderNumberStr, string fileName) {
         // Baut die datei wenn sie nicht existiert
 
-        string dirPath = getfolder + "\\" + FolderName + "\\" + FolderNumberStr + R"(\lagrangian\kinematicCloud\)";
+        string dirPath = getfolder + R"(\)" + FolderName + R"(\)" + FolderNumberStr + R"(\lagrangian\kinematicCloud\)";
 
         // Erstellt die ordner wenn sie nicht existieren
         ofstream File;
@@ -422,7 +422,7 @@ FoamFile
         }
         //schreibt die Daten als txt Ordner
         ofstream File;
-        File.open(getfolder + "\\Spray" + "\\Auswertung.txt");
+        File.open(getfolder + R"(\Spray)" + R"(\Auswertung.txt)");
         if (!File.is_open()) {
             cout << "Unable to open Auswertung.txt";
         }

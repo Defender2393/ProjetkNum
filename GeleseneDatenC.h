@@ -95,7 +95,7 @@ public:
         char Character;
         Character = 'U';
 
-        File.open(getfolder + "\\" + FolderName + "\\" + FolderNumberstr + "\\" + Character);
+        File.open(getfolder + R"(\)" + FolderName + R"(\)" + FolderNumberstr + R"(\)" + Character);
         //öffnet den ordner Fallender Tropfen\ Nummer des Ordners + C oder U in diesem
         File.imbue(std::locale::classic());
         if (!File.is_open() && DevMode == true && ErrorIsThere == false) {

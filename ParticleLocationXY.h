@@ -54,7 +54,7 @@ class Partikel_Eigenschaften {
     // Ermöglicht das Überschreiben von Standardwerten (Overwrite-Flag)
 public:
     Partikel_Eigenschaften() {
-        ifstream config(getfolder() + "\\Config.txt"); //öffnet config
+        ifstream config(getfolder() + R"(\Config.txt)"); //öffnet config
         if (!config.is_open()) {
             cout << "Error in opening config file" << endl; //error wenn config nicht gefunen werden kann
         }

@@ -46,8 +46,8 @@ class Particle {
     //Spray initialdaten
     vector<array<double, 8> > particletxt;
     //Vordefinierter Zeitstempel für Tropfen
-    string namesofFilesTrofpen[22]{
-        "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9",
+    string namesofFilesTrofpen[23]{
+        "0","0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9",
         "9.5", "10", "10.5", "11"
     };
     //Vordefinierter Zeitstempel für Spray

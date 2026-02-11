@@ -186,13 +186,6 @@ public:
         U_py1 = (U_py + (((U_cy - U_py) / tau_von_Partikel(RE, rho_p, diameter, eta))) * (
                      dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta)))));
         //? Keine Beschleunigung in y-Richtung
-        if (Devmode) {
-            cout << "----------------------------------------------------------------------------------" << endl;
-            cout << "U_px zum Zeitpunkt " << Zeitpunkt << ": " << U_px << endl;
-            cout << "U_py zum Zeitpunkt " << Zeitpunkt << ": " << U_py << endl;
-            cout << "U_pz zum Zeitpunkt " << Zeitpunkt << ": " << U_pz << endl;
-            cout << "----------------------------------------------------------------------------------" << endl;
-        }
         temporaryArray[0] = U_px1;
         temporaryArray[1] = U_py1;
         temporaryArray[2] = U_pz;
@@ -201,12 +194,7 @@ public:
 
         pos_x1 = pos_x + U_px * dT; //? Berechnung der Position in x
         pos_y1 = pos_y + U_py * dT; //? Berechnung der Position in y
-        if (Devmode) {
-            cout << "pos_x zum Zeitpunkt " << Zeitpunkt << ": " << pos_x1 << endl;
-            cout << "pos_y zum Zeitpunkt " << Zeitpunkt << ": " << pos_y1 << endl;
-            cout << "pos_z zum Zeitpunkt " << Zeitpunkt << ": " << pos_z << endl;
-            cout << "----------------------------------------------------------------------------------" << endl;
-        }
+
         temporaryArray[3] = diameter;
         temporaryArray[4] = pos_x1;
         temporaryArray[5] = pos_y1;
@@ -226,13 +214,16 @@ public:
 
             temporaryArray[0] = 0.0; //? Geschwindigkeit bei dem Erreichen der Auswertungsebene wird null
             temporaryArray[1] = 0.0;
+
+            U_py1=0;
             if (Devmode) {
                 cout <<
                         "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: "
-                        << U_px1 << " zum Zeitpunkt " << Zeitpunkt << endl;
+                        << U_px << " zum Zeitpunkt " << Zeitpunkt << endl;
                 cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: "
-                        << Cell_ID(pos_x1, pos_y1) << endl;
+                        << Cell_ID(pos_x1-0.1, pos_y1) << endl;
             }
+            U_px1=0;
             // WeitereRandbedingungen:
             // x <= 0   : Decke
             // y <= 0   : untere Wand
@@ -270,14 +261,22 @@ public:
         } else {
             temporaryArray[7] = Cell_ID(pos_x1, pos_y1);
         }
-        if (Devmode) {
-            cout << "Host_ID: " << Cell_ID(pos_x1, pos_y1) << " zum Zeitpunkt " << Zeitpunkt << endl;
-            cout << "----------------------------------------------------------------------------------" << endl;
-        }
-        Zeitpunkt += dT;
+
         temporaryContent.push_back(temporaryArray);
         timeContent.push_back(Zeitpunkt);
-
+        if (Devmode) {
+            cout << "----------------------------------------------------------------------------------" << endl;
+            cout << "U_px zum Zeitpunkt " << Zeitpunkt << ": " << U_px1 << endl;
+            cout << "U_py zum Zeitpunkt " << Zeitpunkt << ": " << U_py1 << endl;
+            cout << "U_pz zum Zeitpunkt " << Zeitpunkt << ": " << U_pz << endl;
+            cout << "----------------------------------------------------------------------------------" << endl;
+            cout << "pos_x zum Zeitpunkt " << Zeitpunkt << ": " << pos_x1 << endl;
+            cout << "pos_y zum Zeitpunkt " << Zeitpunkt << ": " << pos_y1 << endl;
+            cout << "pos_z zum Zeitpunkt " << Zeitpunkt << ": " << pos_z << endl;
+            cout << "----------------------------------------------------------------------------------" << endl;
+            cout << "Host_ID: " << temporaryArray[7] << " zum Zeitpunkt " << Zeitpunkt << endl;
+            cout << "----------------------------------------------------------------------------------" << endl;
+        }
         // Uebergabe der Partikeldaten
         return temporaryArray;
     }
@@ -305,13 +304,8 @@ public:
         RE = Re_von_Partikel(U_px, U_py, U_cx, U_cy, diameter);
         U_px1 = U_px + ((((U_cx - U_px) / tau_von_Partikel(RE, rho_p, diameter, eta)) + (g * (1 - (rho_c / rho_p)))) * (
                             dT / (1 + (dT / tau_von_Partikel(RE, rho_p, diameter, eta)))));
-        if (Devmode) {
-            cout << "----------------------------------------------------------------------------------" << endl;
-            cout << "U_px zum Zeitpunkt " << Zeitpunkt << ": " << U_px << endl;
-            cout << "U_py zum Zeitpunkt " << Zeitpunkt << ": " << U_py << endl;
-            cout << "U_pz zum Zeitpunkt " << Zeitpunkt << ": " << U_pz << endl;
-            cout << "----------------------------------------------------------------------------------" << endl;
-        }
+
+
         temporaryArray[0] = U_px1;
         temporaryArray[1] = U_py1;
         temporaryArray[2] = U_pz;
@@ -321,10 +315,7 @@ public:
         pos_x1 = pos_x + U_px * dT; //? Berechnung der Position in x
         pos_y1 = pos_y + U_py * dT; //? Berechnung der Position in y
         if (Devmode) {
-            cout << "pos_x zum Zeitpunkt " << Zeitpunkt << ": " << pos_x1 << endl;
-            cout << "pos_y zum Zeitpunkt " << Zeitpunkt << ": " << pos_y1 << endl;
-            cout << "pos_z zum Zeitpunkt " << Zeitpunkt << ": " << pos_z << endl;
-            cout << "----------------------------------------------------------------------------------" << endl;
+
         }
         temporaryArray[3] = diameter;
         temporaryArray[4] = pos_x1;
@@ -338,27 +329,39 @@ public:
             temporaryArray[4] = pos_x1;
             temporaryArray[7] = Cell_ID_Tropfen(pos_x1 - 0.1, pos_y1);
 
+            U_py1 = 0;
             temporaryArray[0] = 0.0; //? Geschwindigkeit bei dem Erreichen der Auswertungsebene wird null
             temporaryArray[1] = 0.0;
             if (Devmode) {
                 cout <<
                         "Das Partikel hat die Auswertungsebene erreicht bzw. hat sie ueberschritten! Die Geschwindigkeit zum vorherigen Zeitpunkt betreagt: "
-                        << U_px1 << " zum Zeitpunkt " << Zeitpunkt << endl;
+                        << U_px << " zum Zeitpunkt " << Zeitpunkt << endl;
                 cout << "Vor dem Erreichen der Auswertungsebene befand sich das Partikel in der Zelle mit der Host-ID: "
-                        << Cell_ID_Tropfen(pos_x1, pos_y1) << endl;
+                        << Cell_ID_Tropfen(pos_x1-0.1, pos_y1) << endl;
             }
+            U_px1 = 0;
         } else {
             temporaryArray[7] = Cell_ID_Tropfen(pos_x1, pos_y1);
 
             if (Devmode) {
-                cout << "Host_ID: " << Cell_ID_Tropfen(pos_x1, pos_y1) << " zum Zeitpunkt " << Zeitpunkt << endl;
-                cout << "----------------------------------------------------------------------------------" << endl;
+
             }
         }
-        Zeitpunkt += dT;
         temporaryContent.push_back(temporaryArray);
         timeContent.push_back(Zeitpunkt);
-
+        if (Devmode) {
+            cout << "----------------------------------------------------------------------------------" << endl;
+            cout << "U_px zum Zeitpunkt " << Zeitpunkt << ": " << U_px1 << endl;
+            cout << "U_py zum Zeitpunkt " << Zeitpunkt << ": " << U_py1 << endl;
+            cout << "U_pz zum Zeitpunkt " << Zeitpunkt << ": " << U_pz << endl;
+            cout << "----------------------------------------------------------------------------------" << endl;
+            cout << "pos_x zum Zeitpunkt " << Zeitpunkt << ": " << pos_x1 << endl;
+            cout << "pos_y zum Zeitpunkt " << Zeitpunkt << ": " << pos_y1 << endl;
+            cout << "pos_z zum Zeitpunkt " << Zeitpunkt << ": " << pos_z << endl;
+            cout << "----------------------------------------------------------------------------------" << endl;
+            cout << "Host_ID: " << temporaryArray[7] << " zum Zeitpunkt " << Zeitpunkt << endl;
+            cout << "----------------------------------------------------------------------------------" << endl;
+        }
         //? Uebergabe der Partikeldaten
         return temporaryArray;
     }
